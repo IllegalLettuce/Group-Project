@@ -1,3 +1,5 @@
+import firebase from "firebase/compat";
+
 document.addEventListener("DOMContentLoaded",event =>{
 
     const app = firebase.app();
@@ -12,7 +14,6 @@ document.addEventListener("DOMContentLoaded",event =>{
             const data = doc.data();
             document.write(data.title +`<br>`)
             document.write(data.created)
-
         })
     )
 })
@@ -24,9 +25,7 @@ document.addEventListener("DOMContentLoaded",event =>{
 
 function googleLogin(){
     const provider = new firebase.auth.GoogleAuthProvider();
-
     firebase.auth().signInWithPopup(provider)
-
                 .then(result =>{
                     const user = result.user;
                     document.write(`Hello, ${user.displayName}`);
@@ -36,7 +35,7 @@ function googleLogin(){
                 // Get user info from local storage
                 const user = JSON.parse(localStorage.getItem("user"));
                 console.log(user);
-document.getElementById('backButton').addEventListener('click', function() {
+    document.getElementById('backButton').addEventListener('click', function() {
     window.history.back();
 });
 

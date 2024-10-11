@@ -1,0 +1,124 @@
+body {
+    padding: 50px;
+    font: 18px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+/* Navbar */
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    height: 3rem;
+}
+
+nav li {
+    float: right;
+}
+
+nav li#logo{
+    float: left;
+}
+nav li#logo  img{
+    height: 1rem;
+}
+nav li a {
+    height:3rem;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 16px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: #eae8e8;
+    color: black;
+}
+/* COLUMNS */
+.columnCentre {
+    float:left;
+    width: 66%;
+    padding: 10px;
+}
+.columnCentreSide {
+    float: left;
+    width: 16.5%;
+    padding: 10px;
+}
+.column {
+    float: left;
+    width: 33%;
+    padding: 10px;
+}
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+@media screen and (max-width: 600px) {
+    .column {
+        width: 100%;
+    }
+}
+/* BUTTONS */
+button {
+    margin:0 auto;
+    width: 30%;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    margin-left: 30%;
+    margin-right: 30%;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    background-color: #333;
+}
+
+button:hover {
+    background-color: #eae8e8;
+    color: black;
+    font-size: 28px;
+}
+
+button#tablebutton {
+    font-size: 25px;
+    width: 50%;
+}
+
+/* FORM */
+form input{
+    float: right;
+}
+form select{
+    float:right;
+}
+
+/* TABLE */
+table {
+    border-collapse: separate;
+    border-spacing: 0 15px;
+    text-align: center;
+}
+th{
+    border: 2px solid black;
+    width: 10%;
+    background-color: #333;
+    color:#eae8e8;
+}
+tr#data:hover {
+    box-shadow:0.25em 0.25em  0.25em 0.25em  rgba( 0, 0, 0, 0.4 );;
+}
+
+td {
+    border: 2px solid black;
+}
+
+td#edit{
+    padding: 0;
+    width: 2%;
+}
