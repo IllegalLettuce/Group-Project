@@ -10,18 +10,10 @@ document.addEventListener("DOMContentLoaded", event =>{
 
     function googleLogin(){
         const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider)
+        firebase.auth().signInWithPopup(provider)
             .then(result =>{
-                const user = result.user;
-                document.write(`Hello, ${user.displayName}`);
-                console.log(user)
+                window.location.href="home.html"
             })
-            .catch(console.log)
-        const user = JSON.parse(localStorage.getItem("user"));
-        console.log(user);
-        document.getElementById('backButton').addEventListener('click', function() {
-            window.history.back();
-        });
     }
 
 

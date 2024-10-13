@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
     <link rel='stylesheet' href='https://www.w3schools.com/w3css/4/w3.css' />
-<!--    https://www.w3schools.com/w3css/default.asp easy peasy lemon squeeze -->
-    <title>Login</title>
     <script defer src="/__/firebase/10.14.1/firebase-app-compat.js"></script>
     <script defer src="/__/firebase/10.14.1/firebase-auth-compat.js"></script>
     <script defer src="/__/firebase/10.14.1/firebase-database-compat.js"></script>
@@ -17,23 +15,26 @@
     <script defer src="/__/firebase/10.14.1/firebase-remote-config-compat.js"></script>
     <script defer src="/__/firebase/10.14.1/firebase-performance-compat.js"></script>
     <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-  </head>
-  <body>
-  <script src="/app.js"></script>
-  <!-- Links (sit on top) -->
+    <!--    https://www.w3schools.com/w3css/default.asp easy peasy lemon squeeze -->
+</head>
+<body>
+<script src="/app.js"></script>
+<div class="w3-top">
+    <div class="w3-row w3-large w3-light-grey">
+        <div class="w3-col s3">
+            <a href="/home.html" class="w3-button w3-block">Home</a>
+        </div>
+        <div class="w3-col s3">
+            <a href="#plans" class="w3-button w3-block">Plans</a>
+        </div>
+        <div class="w3-col s3">
+            <a href="/about.html" class="w3-button w3-block">About</a>
+        </div>
+        <div class="w3-col s3">
+            <a href="#contact" class="w3-button w3-block">Contact</a>
+        </div>
+    </div>
+</div>
 
-
-  <div class="w3-container">
-    <button id="googleLoginButton">
-      Google Login
-    </button>
-
-    <button>
-      <a href="/about.html">About</a>
-    </button>
-  </div>
-
-
-
-  </body>
+</body>
 </html>
