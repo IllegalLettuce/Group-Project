@@ -8,7 +8,6 @@ import {getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 firebase.initializeApp(environment.firebase);
 
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -24,18 +23,9 @@ firebase.initializeApp(environment.firebase);
   styleUrl: './app.component.css'
 })
 
-
-
-
-
-
 export class AppComponent {
   title = 'groupproject';
-
   provider = new GoogleAuthProvider();
-
-
-
   googleLogin(){
     const auth = getAuth();
     signInWithPopup(auth, this.provider).then((result) =>{
