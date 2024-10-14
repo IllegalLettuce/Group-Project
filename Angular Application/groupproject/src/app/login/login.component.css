@@ -72,9 +72,6 @@
   color: white;
 }
 
-.login-right {
-  background-color: white;
-}
 
 .login-info {
   text-align: center;
@@ -92,6 +89,26 @@
 .login-info img {
   max-width: 100%;
   height: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
+
+.login-left card {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-left card label {
+  margin-top: 1rem;
+}
+
+.login-left card input {
+  padding: 0.5rem;
+  margin-top: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
 }

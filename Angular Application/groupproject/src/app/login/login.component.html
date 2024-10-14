@@ -3,11 +3,12 @@
   <div class="login-left">
     <h1>Login</h1>
     <button class="btn btn-google" id="google" (click)="googleLogin()">Sign in with Google</button>
-    <form>
+
+    <form  [formGroup]="loginForm" (ngSubmit)="emailLogin()">
       <label for="email">Email</label>
-      <input type="email" id="email" name="email" placeholder="johndoe@gmail.com">
+      <input type="email" id="email" formControlName="email" placeholder="johndoe@gmail.com" required>
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="********************">
+      <input type="password" id="password" formControlName="password" placeholder="********************" required>
       <button type="submit" class="btn btn-signin">Sign In</button>
     </form>
     <p>Don't have an account? <a routerLink="/registration">Register</a></p>
