@@ -4,7 +4,6 @@ import {NavbarComponent} from "./navbar/navbar.component";
 import {CommonModule} from "@angular/common";
 import firebase from 'firebase/compat/app';
 import {environment} from "../environments/environment.development";
-import {getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 firebase.initializeApp(environment.firebase);
 
@@ -25,14 +24,6 @@ firebase.initializeApp(environment.firebase);
 
 export class AppComponent {
   title = 'groupproject';
-  provider = new GoogleAuthProvider();
-  googleLogin(){
-    const auth = getAuth();
-    signInWithPopup(auth, this.provider).then((result) =>{
-      const user = result.user;
-      window.location.replace('dashboard')
-    })
-  }
 }
 
 
