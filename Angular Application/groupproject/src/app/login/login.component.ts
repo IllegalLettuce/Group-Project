@@ -1,9 +1,16 @@
 import { Component } from '@angular/core';
+import {RouterLink, RouterLinkActive} from "@angular/router";
+import {AppRoutes} from "../app.routes";
+
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    AppRoutes
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
