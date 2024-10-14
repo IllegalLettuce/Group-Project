@@ -1,5 +1,18 @@
-<app-login></app-login>
-
+<!--https://medium.com/@chandantechie/create-beautiful-login-page-using-angular-2089bf2e3d41-->
+<div class="login-container">
+  <div class="login-left">
+    <h1>Login</h1>
+    <button class="btn btn-google" id="google" (click)="googleLogin()">Sign in with Google</button>
+    <form>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="johndoe@gmail.com">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="********************">
+      <button type="submit" class="btn btn-signin">Sign In</button>
+    </form>
+    <p>Don't have an account? <a>Register</a></p>
+  </div>
+</div>
 
 
 
