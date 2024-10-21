@@ -8,6 +8,7 @@ export const routes: Routes = [
   {path: '', component: LoginComponent},
   {path: 'registration', component: RegistrationComponent},
   {path: 'dashboard', component: DashboardComponent},
+  {path: 'helpsupport', component: DashboardComponent},
   {path: '**', redirectTo: '/'}
 ];
 
