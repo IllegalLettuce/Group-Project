@@ -1,1 +1,15 @@
 <app-navbar></app-navbar>
+<div class="help-container">
+  <div class="help-left">
+    <h1>Contact Support</h1>
+    <form [formGroup]="helpForm" (ngSubmit)="submitHelp()">
+      <label for="name">Message Title</label>
+      <input type="text" id="name" formControlName="title" required>
+
+      <label for="message">Message</label>
+      <textarea id="message" formControlName="message" rows="10" required></textarea>
+
+      <button type="submit" class="btn btn-signin">Send</button>
+    </form>
+  </div>
+</div>
