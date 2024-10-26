@@ -10,6 +10,7 @@
 **/.idea/dictionaries
 **/.idea/vcs.xml
 **/.idea/jsLibraryMappings.xml
+**/Backend LLM/LLM/config.py
 
 # Sensitive or high-churn files:
 **/.idea/dataSources.ids
