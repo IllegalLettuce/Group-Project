@@ -38,6 +38,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
+
 sealed class Screen(val route: String) {
     object Login : Screen("Login")
     object Register : Screen("Register")
