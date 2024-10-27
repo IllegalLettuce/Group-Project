@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 sealed class Screen(val route: String) {
     object Login : Screen("Login")
@@ -44,6 +46,7 @@ sealed class Screen(val route: String) {
     object Payment : Screen("Payment")
     object PriceAlert : Screen("PriceAlert")
     object HelpSupport : Screen("HelpSupport")
+    object RatingReviewScreen : Screen("RatingReviewScreen")
 }
 
 class MainActivity : ComponentActivity() {
@@ -74,6 +77,7 @@ fun MainApp() {
         composable(Screen.PriceAlert.route) { PriceAlertScreen() }
         composable(Screen.PurchaseAssets.route) { PurchaseAssetsScreen() }
         composable(Screen.HelpSupport.route) { HelpSupportScreen(navController) }
+        composable(Screen.RatingReviewScreen.route) { RatingReviewScreen(navController) }
     }
 }
 
@@ -248,7 +252,7 @@ fun RegisterScreen(navController: NavHostController) {
 fun HomeScreen(navController: NavHostController) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf("Options") }
-    val menuOptions = listOf("Help/Support", "Settings", "Logout")
+    val menuOptions = listOf("Help/Support", "Rating/Review")
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -299,8 +303,8 @@ fun HomeScreen(navController: NavHostController) {
                                 expanded = false
                                 when (option) {
                                     "Help/Support" -> { navController.navigate(Screen.HelpSupport.route) }
-                                    "Settings" -> { /* Navigate to settings screen */ }
-                                    "Logout" -> { /* Handle logout logic */ }
+                                    "Rating/Review" -> { navController.navigate(Screen.RatingReviewScreen.route)}
+                                    "Logout" -> { /* Logout Logic here maybe? */ }
                                 }
                             }
                         )
@@ -318,15 +322,18 @@ fun HomeScreen(navController: NavHostController) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(onClick = { navController.navigate(Screen.PriceAlert.route) }) {
+                TextButton(onClick = { navController.navigate(Screen.PriceAlert.route) },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.White)) {
                     Text("Price Alert")
                 }
 
-                Button(onClick = { navController.navigate(Screen.Payment.route) }) {
+                TextButton(onClick = { navController.navigate(Screen.Payment.route) },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.White)) {
                     Text("Payment")
                 }
 
-                Button(onClick = { navController.navigate(Screen.PurchaseAssets.route) }) {
+                TextButton(onClick = { navController.navigate(Screen.PurchaseAssets.route) },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.White)) {
                     Text("Purchase")
                 }
             }
@@ -363,12 +370,83 @@ fun PaymentScreen() {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Button(onClick = { /* Pop Up Screen with Payement*/  }) {
+            TextButton(onClick = { /* Pop Up Screen with Payement*/  }) {
                 Text("Proceed to Payment")
             }
         }
     }
 }
+
+
+@Composable
+fun RatingReviewScreen(navController: NavController) {
+    var rating by remember { mutableStateOf("") }
+    var review by remember { mutableStateOf("") }
+    var submittedMessage by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.background),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("Rating & Review", style = MaterialTheme.typography.headlineSmall)
+
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(
+                value = rating,
+                onValueChange = { rating = it },
+                label = { Text("Rating (1-5)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = review,
+                onValueChange = { review = it },
+                label = { Text("Review") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            TextButton(onClick = {
+                submitReview(rating, review) { success, message ->
+                    if (success) {
+                        submittedMessage = "Rating: $rating\nReview: $review"
+                        errorMessage = ""
+                    } else {
+                        errorMessage = message ?: "Failed to submit review"
+                    }
+                }
+            }) {
+                Text("Submit")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            if (submittedMessage.isNotEmpty()) {
+                Text(submittedMessage)
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(onClick = { navController.navigate(Screen.Home.route) }) {
+                    Text("Back to Home")
+                }
+            }
+            if (errorMessage.isNotEmpty()) {
+                Text(errorMessage, color = Color.Red)
+            }
+        }
+    }
+}
+
 
 @Composable
 fun PriceAlertScreen() {
@@ -384,7 +462,7 @@ fun PriceAlertScreen() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(onClick = { /* Price Alert Logic, take it to a different Screen */ }) {
+        TextButton(onClick = { /* Price Alert Logic, take it to a different Screen */ }) {
             Text("Set Price Alerts")
         }
     }
@@ -403,7 +481,7 @@ fun PurchaseAssetsScreen() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(onClick = { /* Purchase Logic*/ }) {
+        Button(onClick = { /* maybe different options for payement here like cards and then enter maypement info sned it to firebase but make it secure?*/ }) {
             Text("Purchase Now")
         }
     }
@@ -621,5 +699,22 @@ private fun loginUser(email: String, password: String, onComplete: (Boolean, Str
             } else {
                 onComplete(false, task.exception?.message)
             }
+        }
+}
+
+private fun submitReview(rating: String, review: String, onComplete: (Boolean, String?) -> Unit) {
+    val firestore = FirebaseFirestore.getInstance()
+    val reviewData = hashMapOf(
+        "rating" to rating,
+        "review" to review
+    )
+
+    firestore.collection("reviews")
+        .add(reviewData)
+        .addOnSuccessListener { documentReference ->
+            onComplete(true, null)
+        }
+        .addOnFailureListener { e ->
+            onComplete(false, e.message)
         }
 }
