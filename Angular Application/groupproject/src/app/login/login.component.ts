@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import {RouterLink} from "@angular/router";
 import {getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword} from "firebase/auth";
-import {app} from "../../../server";
 import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 
 
