@@ -16,6 +16,7 @@ import com.example.myapplication.screens.PaymentScreen
 import com.example.myapplication.screens.PriceAlertScreen
 import com.example.myapplication.screens.PurchaseAssetsScreen
 import com.example.myapplication.screens.RatingReviewScreen
+import com.example.myapplication.screens.PurchasePremiumFunctionality
 import com.example.myapplication.screens.RegisterScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.firebase.FirebaseApp
@@ -49,6 +50,7 @@ fun MainApp() {
         composable(Screen.PurchaseAssets.route) { PurchaseAssetsScreen() }
         composable(Screen.HelpSupport.route) { HelpSupportScreen(navController) }
         composable(Screen.RatingReviewScreen.route) { RatingReviewScreen(navController) }
+        composable(Screen.PurchasePremiumFunctionality.route) { PurchasePremiumFunctionality(navController) }
     }
 }
 

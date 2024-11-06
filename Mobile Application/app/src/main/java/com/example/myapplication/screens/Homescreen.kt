@@ -39,7 +39,7 @@ import com.example.myapplication.navigation.Screen
 fun HomeScreen(navController: NavHostController) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf("Options") }
-    val menuOptions = listOf("Help/Support", "Rating/Review")
+    val menuOptions = listOf("Help/Support", "Rating/Review","PurchasePremium")
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -91,6 +91,7 @@ fun HomeScreen(navController: NavHostController) {
                                 when (option) {
                                     "Help/Support" -> { navController.navigate(Screen.HelpSupport.route) }
                                     "Rating/Review" -> { navController.navigate(Screen.RatingReviewScreen.route)}
+                                    "PurchasePremium" -> { navController.navigate(Screen.PurchasePremiumFunctionality.route)}
                                     "Logout" -> { /* Logout Logic here maybe? */ }
                                 }
                             }

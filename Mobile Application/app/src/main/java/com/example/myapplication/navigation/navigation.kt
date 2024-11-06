@@ -1,4 +1,3 @@
-
 package com.example.myapplication.navigation
 
 import androidx.compose.runtime.Composable
@@ -11,6 +10,7 @@ import com.example.myapplication.screens.LoginScreen
 import com.example.myapplication.screens.PaymentScreen
 import com.example.myapplication.screens.PriceAlertScreen
 import com.example.myapplication.screens.PurchaseAssetsScreen
+import com.example.myapplication.screens.PurchasePremiumFunctionality
 import com.example.myapplication.screens.RegisterScreen
 import com.example.myapplication.screens.RatingReviewScreen
 
@@ -23,6 +23,7 @@ sealed class Screen(val route: String) {
     object PriceAlert : Screen("price_alert")
     object HelpSupport : Screen("help_support")
     object RatingReviewScreen : Screen("rating_review")
+    object PurchasePremiumFunctionality : Screen("purchase_premium")
 }
 
 @Composable
@@ -38,5 +39,9 @@ fun NavGraph() {
         composable(Screen.PriceAlert.route) { PriceAlertScreen() }
         composable(Screen.HelpSupport.route) { HelpSupportScreen(navController) }
         composable(Screen.RatingReviewScreen.route) { RatingReviewScreen(navController) }
+        composable(Screen.PurchasePremiumFunctionality.route) {
+            PurchasePremiumFunctionality(navController = navController)
+        }
+
     }
 }
