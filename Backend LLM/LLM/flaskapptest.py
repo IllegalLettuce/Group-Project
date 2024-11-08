@@ -29,8 +29,7 @@ def format_output(text):
 
 # Set up agents and tasks
 # ollama3 = LLM(model="ollama/llama3.2", base_url="http://localhost:11434")
-# ollama3 = LLM(model="ollama/llama3.2", base_url="https://quiet-yak-presently.ngrok-free.app")
-ollama3 = LLM(model="ollama/llama3.2", base_url="https://9bae-157-190-40-134.ngrok-free.app")
+ollama3 = LLM(model="ollama/llama3.2", base_url="https://quiet-yak-presently.ngrok-free.app")
 Gllm = ChatGroq(model_name="groq/llama3-70b-8192", temperature=0.3, max_tokens=4096)
 
 researcher_agent = Agent(
@@ -49,17 +48,18 @@ accountant_agent = Agent(
 
 recommender_agent = Agent(
     role="Recommender Agent",
-    goal="To recommend when it is a good financial decision to purchase more stock and recommend ",
-    backstory="You are an experienced financial analyst specializing in stock recommendations, you are an expert in technical market trends and patterns , you work closely with the Accountant agent to recieve financial data to get accurate predictions",
+    goal="To recommend whether it is a good financial decision to purchase, hold or sell stocks, and give a percentage out of a 100 for each option",
+    backstory="You are an experienced financial analyst specializing in stock recommendations, you are an expert in technical market trends and patterns , you work closely with the Accountant agent to recieve financial data to give accurate recommendations",
+    llm=ollama3
+)
+ 
+blogger_agent = Agent(
+    role="Blogger Agent",
+    goal="write short and informative blogs in a set stucture where quick decisions need to be made ",
+    backstory="loves to Write  short accurate detailed informative blogs, on a given input query.",
     llm=ollama3
 )
 
-blogger_agent = Agent(
-    role="Blogger Agent",
-    goal="Provide summaries and predictions on company performance.",
-    backstory="Writes short, informative blogs.",
-    llm=ollama3
-)
 
 
 
@@ -91,7 +91,8 @@ def main():
                     agent=accountant_agent,
                     expected_output="""A summary of financial leverage, such as debt-to-equity ratio.
     
-                        {
+                        {      
+                            "stock_symbol": str,
                             "financial_metrics": {
                                 "pe_ratio": float,
                                 "debt_to_equity": float,
@@ -108,6 +109,7 @@ def main():
                             }
                         }
                         """,
+                        dependency =[researcher_task]
 
                 )
 
@@ -120,7 +122,7 @@ def main():
                         {
                             "recommendation": {
                                 "stock_symbol": str,
-                                "action": "BUY" | "HOLD" | "WAIT",
+                                "action": "BUY" | "HOLD" | "SELL",
                                 "target_price": float,
                                 "position_size": float,
                                 "risk_level": str,
@@ -153,7 +155,7 @@ def main():
                 blogger_task = Task(
                     description=f"{recommender_task}",
                     agent=blogger_agent,
-                    expected_output="A short blog summary on company performance and outlook."
+                    expected_output="A very short informative detailed blog about how well a company is doing, and recommended percentages for buy|sell|hold"
                 )
                 crew = Crew(agents=[researcher_agent, accountant_agent, blogger_agent], tasks=[researcher_task, accountant_task, blogger_task], verbose=True)
                 result = crew.kickoff()
