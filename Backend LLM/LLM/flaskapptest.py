@@ -28,8 +28,8 @@ def format_output(text):
     return re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
 
 # Set up agents and tasks
-# ollama3 = LLM(model="ollama/llama3.2", base_url="http://localhost:11434")
-ollama3 = LLM(model="ollama/llama3.2", base_url="https://quiet-yak-presently.ngrok-free.app")
+ollama3 = LLM(model="ollama/llama3.2", base_url="http://localhost:11434")
+#ollama3 = LLM(model="ollama/llama3.2", base_url="https://quiet-yak-presently.ngrok-free.app")
 Gllm = ChatGroq(model_name="groq/llama3-70b-8192", temperature=0.3, max_tokens=4096)
 
 researcher_agent = Agent(
@@ -55,7 +55,7 @@ recommender_agent = Agent(
  
 blogger_agent = Agent(
     role="Blogger Agent",
-    goal="write short and informative blogs in a set stucture where quick decisions need to be made ",
+    goal="write a very short and informative blogs in a set stucture where quick decisions need to be made ",
     backstory="loves to Write  short accurate detailed informative blogs, on a given input query.",
     llm=ollama3
 )
@@ -92,8 +92,9 @@ def main():
                     expected_output="""A summary of financial leverage, such as debt-to-equity ratio.
     
                         {      
-                            "stock_symbol": str,
+                            
                             "financial_metrics": {
+                                "stock_symbol": str,
                                 "pe_ratio": float,
                                 "debt_to_equity": float,
                                 "current_ratio": float,
@@ -155,7 +156,7 @@ def main():
                 blogger_task = Task(
                     description=f"{recommender_task}",
                     agent=blogger_agent,
-                    expected_output="A very short informative detailed blog about how well a company is doing, and recommended percentages for buy|sell|hold"
+                    expected_output="A very short informative detailed blog in about 4 lines, about how well a company is doing, and recommended percentages for buy|sell|hold, and always share the 3 different percentages ensure its the same asfinal output with no duplicate values or outputs"
                 )
                 crew = Crew(agents=[researcher_agent, accountant_agent, blogger_agent], tasks=[researcher_task, accountant_task, blogger_task], verbose=True)
                 result = crew.kickoff()
