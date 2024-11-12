@@ -8,25 +8,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 
 @Composable
-fun PurchaseAssetsScreen() {
+fun LLMPredictionScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-
         Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -35,17 +34,26 @@ fun PurchaseAssetsScreen() {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Purchase Assets",
+                text = "LLM Prediction",
                 style = MaterialTheme.typography.headlineSmall
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Purchase button
+            // Placeholder for prediction result
+            Text(
+                text = "Prediction result will appear here",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+
             Button(
-                onClick = { /* payment logic */}
+                onClick = { /* Add LLM prediction logice */ }
             ) {
-                Text("Purchase Now")
+                Text("Generate Prediction")
             }
         }
     }

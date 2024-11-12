@@ -35,7 +35,7 @@ import com.example.myapplication.navigation.Screen
 // Experimental Features are used, maybe remove later incase it provides an "error"??
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HelpSupportScreen(navController: NavHostController) {
+fun HelpSupportScreen(navController: NavHostController, modifier: Modifier = Modifier) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var subject by remember { mutableStateOf("") }
