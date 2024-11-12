@@ -1,2 +1,23 @@
 <app-navbar></app-navbar>
-<p>dashboard works!</p>
+
+
+<div>
+  <div>
+    <h3>Select Stock</h3>
+    <p>
+      <button id="Lockheed Martin" (click)="getStockNameFromUser('Lockheed Martin')">Lockheed Martin</button>
+<!--      @for (post of data; track post.id){-->
+<!--        <p>{{post.blog}}</p>-->
+<!--      }-->
+    </p>
+    <p>
+      <button id="Apple"  (click)="getStockNameFromUser('Apple')">Apple</button>
+    </p>
+    <p>
+    <button  id="Google" (click)="getStockNameFromUser('Google')">Google</button>
+  </p>
+  </div>
+
+</div>
+
+

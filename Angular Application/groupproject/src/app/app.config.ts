@@ -8,10 +8,12 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 import {collection, Firestore, getDocs, getFirestore, provideFirestore} from '@angular/fire/firestore';
+import {provideHttpClient} from "@angular/common/http";
 
 export const appConfig: ApplicationConfig = {
   providers: [provideRouter(routes),
     provideClientHydration(),
+    provideHttpClient(),
     provideAnimationsAsync(),
     provideFirebaseApp(() => initializeApp(
       {"projectId":"year3groupproject-ee682",
@@ -26,5 +28,6 @@ export const appConfig: ApplicationConfig = {
     provideAnalytics(() => getAnalytics()),
     ScreenTrackingService,
     UserTrackingService,
-    provideFirestore(() => getFirestore())]
+    provideFirestore(() => getFirestore())],
+
 };
