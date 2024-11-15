@@ -1,16 +1,18 @@
 import os
+
+import json
+
 import config
 from flask import Flask, request, render_template
 import logging
 import re
-
-# Import required modules from langchain_community, crewai, etc.
-from langchain_community.llms import Ollama
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 from crewai import Agent, Task, Crew, LLM
 from langchain_groq import ChatGroq
-from groq import Groq
+
+
+# Import required modules from langchain_community, crewai, etc.
+
+
 
 # Configure environment variables for API keys and model names
 os.environ["OPENAI_API_BASE"] = "https://api.groq.com/openai/v1"
@@ -29,7 +31,7 @@ def format_output(text):
 
 # Set up agents and tasks
 ollama3 = LLM(model="ollama/llama3.2", base_url="http://localhost:11434")
-#ollama3 = LLM(model="ollama/llama3.2", base_url="https://quiet-yak-presently.ngrok-free.app")
+# ollama3 = LLM(model="ollama/llama3.2", base_url="https://quiet-yak-presently.ngrok-free.app")
 Gllm = ChatGroq(model_name="groq/llama3-70b-8192", temperature=0.3, max_tokens=4096)
 
 researcher_agent = Agent(
@@ -55,7 +57,7 @@ recommender_agent = Agent(
  
 blogger_agent = Agent(
     role="Blogger Agent",
-    goal="write a very short and informative blogs in a set stucture where quick decisions need to be made ",
+    goal="write short and informative blogs in a set stucture where quick decisions need to be made ",
     backstory="loves to Write  short accurate detailed informative blogs, on a given input query.",
     llm=ollama3
 )
@@ -75,12 +77,19 @@ def main():
     query_input = None
     output = None
     if request.method == 'POST':
-        query_input = request.form.get('query-input')
+
+        # test at home
+        # query_input = request.form.get('query-input')
+
+        # actual implementation
+        query_input = request.data
+
+
         if query_input:
             try:
 
                 researcher_task = Task(
-                    description="Research financial data for " + query_input,
+                    description="Research financial data for " + str(query_input) + " using yahoo finance news as of todays date",
                     agent=researcher_agent,
                     expected_output="Latest financial insights for making predictions."
                 )
@@ -92,9 +101,8 @@ def main():
                     expected_output="""A summary of financial leverage, such as debt-to-equity ratio.
     
                         {      
-                            
+                            "stock_symbol": str,
                             "financial_metrics": {
-                                "stock_symbol": str,
                                 "pe_ratio": float,
                                 "debt_to_equity": float,
                                 "current_ratio": float,
@@ -156,18 +164,44 @@ def main():
                 blogger_task = Task(
                     description=f"{recommender_task}",
                     agent=blogger_agent,
-                    expected_output="A very short informative detailed blog in about 4 lines, about how well a company is doing, and recommended percentages for buy|sell|hold, and always share the 3 different percentages ensure its the same asfinal output with no duplicate values or outputs"
+                    # expected_output="A very short informative detailed blog about how well a company is doing, and recommended percentages for buy|sell|hold"
+                    expected_output="A very short informative detailed blog about how well a company is doing (about 20 words), and recommended percentages for buy|sell|hold which would be in the format of Buy : x% , Hold: y% , Sell: z% (dont write anything extra, and output it in this Json format"
+                                    "{"
+                                    '"blog": "{Informative detailed blog goes here}",'
+                                   ' "recommendation": {'
+                                  '"buy"": "x%",'
+                                '"hold": "y%",'
+                                '"sell": "z%"'
+                               " },"
+                                '"date":(date from which you got this information from)'
+                               " }"
+
                 )
                 crew = Crew(agents=[researcher_agent, accountant_agent, blogger_agent], tasks=[researcher_task, accountant_task, blogger_task], verbose=True)
                 result = crew.kickoff()
+
                 result = str(result)
 
+                print(result)
+
                 output = format_output(result)
+                # for json
+                jsonobject = json.loads(output)
+                # actual implementation
+                return jsonobject
+
+
 
             except Exception as e:
                 logging.error(f"Error during task execution: {e}")
                 output = "Sorry, an error occurred while processing your request."
-    return render_template('index.html', query_input=query_input, output=output)
+
+    # else:
+    #     return 'Welcome! Send a POST request to submit data.', 200
+
+    # test at home
+    # return render_template('index.html', query_input=query_input, output=output)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
