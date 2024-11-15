@@ -1,12 +1,15 @@
 import {Component, inject} from '@angular/core';
 import {NavbarComponent} from "../navbar/navbar.component";
 import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {FormsModule} from "@angular/forms";
+import {environment} from "../../environments/environment.development";
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     NavbarComponent,
+    FormsModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
@@ -15,30 +18,35 @@ export class DashboardComponent {
 
   httpClient = inject(HttpClient);
   public data: Array<any> = [];
+  buy: any;
+  sell: any ;
 
+  //takes stock data from the form
+  submitStockData(stockName: String, buy: any, sell: any){
 
-  ngOnInit(){
-
+    this.sendToLLM(stockName, buy, sell, 1000)
   }
 
-  getStockNameFromUser(name: String){
-    console.log(name)
-    this.sendStockNameToLLM(name)
-  }
+  //sends stock data to API as JSON
+  sendToLLM(name:String, buy: any, sell: any, funds_dollar: any ){
 
-
-  async sendStockNameToLLM(name:String){
     let message:JSON = <JSON><unknown>{
-      "company": name
-    }
+      "company": name,
+      "buy_percent": buy,
+      "sell_percent": sell,
+      "funds_dollar": funds_dollar,
+    };
+    console.log(message);
     const myJSON = JSON.stringify(message);
+    console.log(myJSON);
 
-    this.httpClient.post('https://quiet-yak-presently.ngrok-free.app', name)
+    const uri = environment.API_BASE_URL;
+
+    this.httpClient.post(uri, myJSON)
       .subscribe({
         next: (data: any) => {
-          console.log(data.blog);
-          console.log(data.recommendation);
           this.data = data;
+          console.log(data)
         }, error: (err) => console.log(err)
       });
   }
@@ -48,5 +56,6 @@ export class DashboardComponent {
 
 
 
+/////////////////////////end of file
 
 }
