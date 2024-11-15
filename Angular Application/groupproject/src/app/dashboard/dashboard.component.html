@@ -1,23 +1,30 @@
 <app-navbar></app-navbar>
 
-
 <div>
   <div>
     <h3>Select Stock</h3>
-    <p>
-      <button id="Lockheed Martin" (click)="getStockNameFromUser('Lockheed Martin')">Lockheed Martin</button>
-<!--      @for (post of data; track post.id){-->
-<!--        <p>{{post.blog}}</p>-->
-<!--      }-->
-    </p>
-    <p>
-      <button id="Apple"  (click)="getStockNameFromUser('Apple')">Apple</button>
-    </p>
-    <p>
-    <button  id="Google" (click)="getStockNameFromUser('Google')">Google</button>
-  </p>
+    <form (ngSubmit)="submitStockData('Lockheed Martin', buy, sell)">
+      <label for="lockheedBuy">Buy Percentage:</label>
+      <input
+        type="number"
+        id="lockheedBuy" [(ngModel)]="buy"
+        name="lockheedBuy"
+        placeholder="Buy"
+        required
+        min="0"
+        max="100">
+      <label for="lockheedSell">Sell Percentage:</label>
+      <input
+        type="number"
+        id="lockheedSell" [(ngModel)]="sell"
+        name="lockheedSell"
+        placeholder="Enter Sell Percentage"
+        required
+        min="0"
+        max="100">
+      <button type="submit">Submit Lockheed Martin</button>
+    </form>
   </div>
-
 </div>
 
 
