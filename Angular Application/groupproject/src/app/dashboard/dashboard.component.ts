@@ -1,8 +1,9 @@
 import {Component, inject} from '@angular/core';
 import {NavbarComponent} from "../navbar/navbar.component";
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
 import {environment} from "../../environments/environment.development";
+import {NgForOf} from "@angular/common";
 
 @Component({
   selector: 'app-dashboard',
@@ -10,6 +11,7 @@ import {environment} from "../../environments/environment.development";
   imports: [
     NavbarComponent,
     FormsModule,
+    NgForOf,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
@@ -21,9 +23,19 @@ export class DashboardComponent {
   buy: any;
   sell: any ;
 
+  stocks = [
+    { name: 'Lockheed Martin', buy: 0, sell: 0 },
+    { name: 'Tesla', buy: 0, sell: 0 },
+    { name: 'Apple', buy: 0, sell: 0 },
+    // Add more companies as needed
+  ];
+
+  generateReport(name: String){
+    console.log("Generating report for", name);
+  }
+
   //takes stock data from the form
   submitStockData(stockName: String, buy: any, sell: any){
-
     this.sendToLLM(stockName, buy, sell, 1000)
   }
 
@@ -50,11 +62,6 @@ export class DashboardComponent {
         }, error: (err) => console.log(err)
       });
   }
-
-
-
-
-
 
 /////////////////////////end of file
 

@@ -21,5 +21,4 @@ export class NavbarComponent {
       window.location.replace('')
     }).catch(console.log)
   }
-
 }

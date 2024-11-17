@@ -1,0 +1,74 @@
+/* Ensure full height and width for centering */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;   /* Arrange the forms in a vertical column */
+  justify-content: flex-start;  /* Align forms at the top of the container */
+  align-items: center;       /* Center horizontally */
+  height: 100%;              /* Make container take full height */
+  padding: 20px;
+}
+
+.form-container {
+  padding: 20px;
+  margin-bottom: 20px;  /* Add some space between forms */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  width: 100%;
+  max-width: 500px;  /* Optional: limits the width of the form */
+}
+
+h3 {
+  text-align: center;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;  /* Space the inputs out on the same line */
+  gap: 10px;                       /* Optional: Adds spacing between the inputs */
+}
+
+input {
+  width: 48%;                      /* Adjust width to fit both inputs on one line */
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;  /* Add spacing between buttons */
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* Optional: Style for the Generate Report button to differentiate it */
+button[type="button"] {
+  background-color: #2196F3; /* Blue color for the report button */
+}
+
+button[type="button"]:hover {
+  background-color: #1976D2; /* Darker blue on hover */
+}
+
