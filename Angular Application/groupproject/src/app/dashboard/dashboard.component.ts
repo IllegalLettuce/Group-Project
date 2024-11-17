@@ -48,13 +48,9 @@ export class DashboardComponent {
       "sell_percent": sell,
       "funds_dollar": funds_dollar,
     };
-    console.log(message);
-    const myJSON = JSON.stringify(message);
-    console.log(myJSON);
 
     const uri = environment.API_BASE_URL;
-
-    this.httpClient.post(uri, myJSON)
+    this.httpClient.post(uri, message)
       .subscribe({
         next: (data: any) => {
           this.data = data;
