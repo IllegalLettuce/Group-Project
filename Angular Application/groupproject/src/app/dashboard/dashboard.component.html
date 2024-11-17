@@ -5,7 +5,6 @@
     <h3>Select Stock: {{ stock.name }}</h3>
     <form (ngSubmit)="submitStockData(stock.name, stock.buy, stock.sell)">
 
-      <!-- Buy and Sell percentages on the same line -->
       <div class="form-row">
         <div>
           <label for="buy{{i}}" class="col-constructor-name">Buy Percentage:</label>
@@ -32,13 +31,11 @@
             min="0"
             max="100">
         </div>
+
       </div>
-
-      <!-- Submit button for submitting form data -->
       <button type="submit">Manage {{ stock.name }}</button>
-
-      <!-- Generate Report button, which now passes only the stock name -->
       <button type="button" (click)="generateReport(stock.name)">Generate Report</button>
+      <button type="button" (click)="openReportDialog(stock.name)">Open Dialog</button>
     </form>
   </div>
 </div>

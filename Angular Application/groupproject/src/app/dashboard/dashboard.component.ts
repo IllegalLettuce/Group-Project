@@ -4,6 +4,9 @@ import {HttpClient} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
 import {environment} from "../../environments/environment.development";
 import {NgForOf} from "@angular/common";
+import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import {ReportmodalComponent} from "./modals/reportmodal/reportmodal.component";
+import {CommonModule} from "@angular/common";
 
 @Component({
   selector: 'app-dashboard',
@@ -12,6 +15,8 @@ import {NgForOf} from "@angular/common";
     NavbarComponent,
     FormsModule,
     NgForOf,
+    MatDialogModule,
+    CommonModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
@@ -23,6 +28,8 @@ export class DashboardComponent {
   buy: any;
   sell: any ;
 
+  constructor(private dialog: MatDialog) {}
+
   stocks = [
     { name: 'Lockheed Martin', buy: 0, sell: 0 },
     { name: 'Tesla', buy: 0, sell: 0 },
@@ -30,7 +37,15 @@ export class DashboardComponent {
     // Add more companies as needed
   ];
 
-  generateReport(name: String){
+  openReportDialog(name: string){
+    this.dialog.open(ReportmodalComponent, {
+      width: '250px',
+      data: { name: name }
+    })
+  }
+
+
+    generateReport(name: String){
     console.log("Generating report for", name);
   }
 

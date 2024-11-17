@@ -1,4 +1,4 @@
-/* Ensure full height and width for centering */
+
 html, body {
   height: 100%;
   margin: 0;
@@ -6,22 +6,22 @@ html, body {
 
 .container {
   display: flex;
-  flex-direction: column;   /* Arrange the forms in a vertical column */
-  justify-content: flex-start;  /* Align forms at the top of the container */
-  align-items: center;       /* Center horizontally */
-  height: 100%;              /* Make container take full height */
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
   padding: 20px;
 }
 
 .form-container {
   padding: 20px;
-  margin-bottom: 20px;  /* Add some space between forms */
+  margin-bottom: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   width: 100%;
-  max-width: 500px;  /* Optional: limits the width of the form */
+  max-width: 500px;
 }
 
 h3 {
