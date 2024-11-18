@@ -1,8 +1,13 @@
-<h2 mat-dialog-title>Dialog Title</h2>
+<h2 mat-dialog-title>{{ data.name }}</h2>
 <mat-dialog-content>
-  <p>{{ data.name }}</p>
+
+  <div *ngIf="isLoading">
+    <p>Our top monkeys are analysing the company, this might take them several seconds...</p>
+  </div>
+
+  <div *ngIf="!isLoading && response_data">
+    <p>Response: {{ response_data.response }}</p>
+  </div>
 
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button mat-dialog-close>Close</button>
-</mat-dialog-actions>
+

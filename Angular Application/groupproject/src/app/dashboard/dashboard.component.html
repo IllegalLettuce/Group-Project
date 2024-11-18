@@ -1,42 +1,14 @@
 <app-navbar></app-navbar>
-
 <div class="container">
   <div class="form-container" *ngFor="let stock of stocks; let i = index">
     <h3>Select Stock: {{ stock.name }}</h3>
-    <form (ngSubmit)="submitStockData(stock.name, stock.buy, stock.sell)">
-
-      <div class="form-row">
-        <div>
-          <label for="buy{{i}}" class="col-constructor-name">Buy Percentage:</label>
-          <input
-            type="number"
-            id="buy{{i}}"
-            [(ngModel)]="stock.buy"
-            name="buy{{i}}"
-            placeholder="Buy"
-            required
-            min="0"
-            max="100">
-        </div>
-
-        <div>
-          <label for="sell{{i}}">Sell Percentage:</label>
-          <input
-            type="number"
-            id="sell{{i}}"
-            [(ngModel)]="stock.sell"
-            name="sell{{i}}"
-            placeholder="Enter Sell Percentage"
-            required
-            min="0"
-            max="100">
-        </div>
-
-      </div>
-      <button type="submit">Manage {{ stock.name }}</button>
-      <button type="button" (click)="generateReport(stock.name)">Generate Report</button>
-      <button type="button" (click)="openReportDialog(stock.name)">Open Dialog</button>
-    </form>
+    <div>
+      <!--      Here goes the graph-->
+    </div>
+    <div>
+      <button type="button" (click)="openReportDialog(stock.name)">Generate Report</button>
+      <button type="button" (click)="openManageDialog(stock.name)">Manage Stock</button>
+    </div>
   </div>
 </div>
 
