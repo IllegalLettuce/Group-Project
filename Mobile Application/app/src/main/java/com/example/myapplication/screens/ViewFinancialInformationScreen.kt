@@ -1,29 +1,27 @@
 package com.example.myapplication.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+
 import com.example.myapplication.R
 
 @Composable
 fun ViewFinancialInformationScreen() {
+    val context = LocalContext.current
+    val financialInfo = remember { mutableStateListOf<String>() }
+    val isLoading = remember { mutableStateOf(false) }
+
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Image(
             painter = painterResource(id = R.drawable.background),
@@ -46,6 +44,18 @@ fun ViewFinancialInformationScreen() {
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            Button(onClick = {
+
+            }) {
+                Text("Fetch Financial Information",)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
         }
     }
 }
+
+
+

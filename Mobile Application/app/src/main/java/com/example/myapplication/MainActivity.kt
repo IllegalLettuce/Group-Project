@@ -44,11 +44,13 @@ import com.example.myapplication.screens.LLMPredictionScreen
 import com.example.myapplication.screens.ViewFinancialInformationScreen
 
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         setUserLoggedIn(this, false)
+
 
         enableEdgeToEdge()
         setContent {
