@@ -1,23 +1,15 @@
 <app-navbar></app-navbar>
-
-
-<div>
-  <div>
-    <h3>Select Stock</h3>
-    <p>
-      <button id="Lockheed Martin" (click)="getStockNameFromUser('Lockheed Martin')">Lockheed Martin</button>
-<!--      @for (post of data; track post.id){-->
-<!--        <p>{{post.blog}}</p>-->
-<!--      }-->
-    </p>
-    <p>
-      <button id="Apple"  (click)="getStockNameFromUser('Apple')">Apple</button>
-    </p>
-    <p>
-    <button  id="Google" (click)="getStockNameFromUser('Google')">Google</button>
-  </p>
+<div class="container">
+  <div class="form-container" *ngFor="let stock of stocks; let i = index">
+    <h3>Select Stock: {{ stock.name }}</h3>
+    <div>
+      <!--      Here goes the graph-->
+    </div>
+    <div>
+      <button type="button" (click)="openReportDialog(stock.name)">Generate Report</button>
+      <button type="button" (click)="openManageDialog(stock.name)">Manage Stock</button>
+    </div>
   </div>
-
 </div>
 
 

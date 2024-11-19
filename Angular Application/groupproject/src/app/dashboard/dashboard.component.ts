@@ -1,52 +1,56 @@
-import {Component, inject} from '@angular/core';
+import {Component} from '@angular/core';
 import {NavbarComponent} from "../navbar/navbar.component";
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {FormsModule} from "@angular/forms";
+import {NgForOf} from "@angular/common";
+import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import {ReportmodalComponent} from "./modals/reportmodal/reportmodal.component";
+import {CommonModule} from "@angular/common";
+import {ManagemodalComponent} from "./modals/managemodal/managemodal.component";
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     NavbarComponent,
+    FormsModule,
+    NgForOf,
+    MatDialogModule,
+    CommonModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
 
-  httpClient = inject(HttpClient);
-  public data: Array<any> = [];
+  public data:any;
+  stocks = [
+    { name: 'Lockheed Martin', buy: 0, sell: 0 },
+    { name: 'Tesla', buy: 0, sell: 0 },
+    { name: 'Apple', buy: 0, sell: 0 },
+    // Add more companies as needed
+  ];
+  constructor(private dialog: MatDialog) {}
 
+  /**
+   * Controls the report dialog from the frontend
+   * @param name
+   */
+  openReportDialog(name: string){
+    this.dialog.open(ReportmodalComponent, {
+      width: '24em',
+      data: { name: name }
+    })
+  };
 
-  ngOnInit(){
-
+  /**
+   * Controls the manage stocks dialog from the frontend
+   * @param name
+   */
+  openManageDialog(name: string){
+    this.dialog.open(ManagemodalComponent, {
+      width: '24em',
+      data: { name: name }
+    })
   }
-
-  getStockNameFromUser(name: String){
-    console.log(name)
-    this.sendStockNameToLLM(name)
-  }
-
-
-  async sendStockNameToLLM(name:String){
-    let message:JSON = <JSON><unknown>{
-      "company": name
-    }
-    const myJSON = JSON.stringify(message);
-
-    this.httpClient.post('https://quiet-yak-presently.ngrok-free.app', name)
-      .subscribe({
-        next: (data: any) => {
-          console.log(data.blog);
-          console.log(data.recommendation);
-          this.data = data;
-        }, error: (err) => console.log(err)
-      });
-  }
-
-
-
-
-
-
-
+/////////////////////////end of file
 }
