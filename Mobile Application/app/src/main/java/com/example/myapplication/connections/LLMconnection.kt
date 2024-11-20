@@ -1,41 +1,64 @@
-import android.content.Context
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Retrofit
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 
-fun connection(context: Context) {
-    val apiSample = "https://quiet-yak-presently.ngrok-free.app/"
+@Serializable
+data class Stock(
+    val company: String,
+    val buy_percent: Int,
+    val sell_percent: Int,
+    val funds_dollar: Int
+)
 
-    val myRequestQueue: RequestQueue = Volley.newRequestQueue(context)
 
-    val myStringRequest = object : StringRequest(Request.Method.POST, apiSample,
-        { response ->
-            println("Response: $response")
-        },
-        { error ->
-            error.printStackTrace()
-            println("Error: ${error.message}")
-        }) {
-        override fun getBody(): ByteArray {
-            val jsonBody = """
-                {
-                    "company":
-                }
-            """.trimIndent()
-            return jsonBody.toByteArray(Charsets.UTF_8)
-        }
+object RetrofitInstance {
+    private const val BASE_URL = "https://d-yak-presently.ngrok-free.app/"
+    private val json = Json { ignoreUnknownKeys = true }
 
-        override fun getBodyContentType(): String {
-            return "application/json; charset=utf-8"
+    val api: StockApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(StockApiService::class.java)
+    }
+}
+
+
+interface StockApiService {
+    @GET("https://quiet-yak-presently.ngrok-free.app/manages")
+    suspend fun getStockInfo(
+        @Query("q") query: String
+    ): Stock
+}
+
+
+class StockViewModel : ViewModel() {
+    private val _stock = MutableStateFlow<Stock?>(null)
+    val stock = _stock
+
+    fun fetchStock(query: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.getStockInfo(query)
+                println("Response: $response")
+                _stock.value = response
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _stock.value = null
+            }
         }
     }
-    myRequestQueue.add(myStringRequest)
 }
 
 
-fun fetchData() {
-    //TO DO
-
-}

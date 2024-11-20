@@ -90,11 +90,6 @@ fun RegisterScreen(navController: NavHostController) {
                         onValueChange = { email = it },
                         label = { Text("Email") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.White,
-                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                            unfocusedIndicatorColor = Color.Gray
-                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 16.dp)
@@ -105,11 +100,6 @@ fun RegisterScreen(navController: NavHostController) {
                         onValueChange = { password = it },
                         label = { Text("Password") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        colors = TextFieldDefaults.textFieldColors(
-                            containerColor = Color.White,
-                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                            unfocusedIndicatorColor = Color.Gray
-                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 24.dp)
