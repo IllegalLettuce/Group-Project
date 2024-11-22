@@ -75,13 +75,6 @@ fun HomeScreen(navController: NavHostController, modifier: Modifier = Modifier) 
                     readOnly = true,
                     label = { Text("Menu", color = Color.White) },
                     modifier = Modifier.menuAnchor(),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedLabelColor = Color.White,
-                        unfocusedLabelColor = Color.White
-                    )
                 )
 
                 DropdownMenu(
