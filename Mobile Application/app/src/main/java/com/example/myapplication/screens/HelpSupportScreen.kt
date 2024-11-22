@@ -69,10 +69,7 @@ fun HelpSupportScreen(navController: NavHostController, modifier: Modifier = Mod
                 onValueChange = { firstName = it },
                 label = { Text("First Name") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                )
+
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -82,10 +79,6 @@ fun HelpSupportScreen(navController: NavHostController, modifier: Modifier = Mod
                 onValueChange = { lastName = it },
                 label = { Text("Last Name") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -95,10 +88,6 @@ fun HelpSupportScreen(navController: NavHostController, modifier: Modifier = Mod
                 onValueChange = { subject = it },
                 label = { Text("Subject") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -110,10 +99,6 @@ fun HelpSupportScreen(navController: NavHostController, modifier: Modifier = Mod
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                ),
                 maxLines = 5,
                 visualTransformation = VisualTransformation.None
             )
