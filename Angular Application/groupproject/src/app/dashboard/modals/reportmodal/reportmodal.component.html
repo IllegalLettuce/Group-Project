@@ -2,11 +2,11 @@
 <mat-dialog-content>
 
   <div *ngIf="isLoading">
-    <p>Our top monkeys are analysing the company, this might take them several seconds...</p>
+    <p>Our top monkeys are analysing the company, this might take them several seconds..</p>
   </div>
 
   <div *ngIf="!isLoading && response_data">
-    <p>Response: {{ response_data.response }}</p>
+    <p>Response: {{ response_data.blog }}</p>
   </div>
 
 </mat-dialog-content>

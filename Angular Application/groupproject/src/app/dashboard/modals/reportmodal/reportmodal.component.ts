@@ -58,7 +58,7 @@ export class ReportmodalComponent implements OnInit{
     try{
       const uri_report = this.uri + '/report';
       const data = await firstValueFrom(
-        this.httpClient.post(uri_report, {params: {name}}).pipe(timeout(20000))
+        this.httpClient.post(uri_report, {params: {name}}).pipe(timeout(120000))
       );
       this.response_data = data;
       console.log(data)
