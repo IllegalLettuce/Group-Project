@@ -3,7 +3,7 @@
 import { Component } from '@angular/core';
 import {NavbarComponent} from "../navbar/navbar.component";
 import {RouterLink} from "@angular/router";
-import {FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {getAuth, createUserWithEmailAndPassword} from "firebase/auth";
 import {NgIf} from "@angular/common";
 

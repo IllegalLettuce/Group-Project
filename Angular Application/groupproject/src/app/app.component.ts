@@ -5,6 +5,7 @@ import {CommonModule} from "@angular/common";
 import firebase from 'firebase/compat/app';
 import {environment} from "../environments/environment.development";
 
+
 firebase.initializeApp(environment.firebase);
 
 @Component({
@@ -16,7 +17,7 @@ firebase.initializeApp(environment.firebase);
     RouterLinkActive,
     RouterOutlet,
     NavbarComponent,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
