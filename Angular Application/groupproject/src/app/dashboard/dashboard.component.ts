@@ -24,9 +24,9 @@ export class DashboardComponent {
 
   public data:any;
   stocks = [
-    { name: 'Lockheed Martin', buy: 0, sell: 0 },
-    { name: 'Tesla', buy: 0, sell: 0 },
-    { name: 'Apple', buy: 0, sell: 0 },
+    { name: 'Lockheed Martin', ticker: "NYSE:LMT"},
+    { name: 'Tesla', ticker: "NASDAQ: TSLA"},
+    { name: 'Apple', ticker: "NASDAQ: AAPL"},
     // Add more companies as needed
   ];
   constructor(private dialog: MatDialog) {}
@@ -45,11 +45,12 @@ export class DashboardComponent {
   /**
    * Controls the manage stocks dialog from the frontend
    * @param name
+   * @param ticker
    */
-  openManageDialog(name: string){
+  openManageDialog(name: string, ticker: string){
     this.dialog.open(ManagemodalComponent, {
       width: '24em',
-      data: { name: name }
+      data: { name: name, ticker: ticker }
     })
   }
 /////////////////////////end of file

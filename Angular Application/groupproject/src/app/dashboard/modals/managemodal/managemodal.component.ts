@@ -3,7 +3,7 @@ import {environment} from "../../../../environments/environment.development";
 import {MAT_DIALOG_DATA, MatDialogContent, MatDialogTitle} from "@angular/material/dialog";
 import {HttpClient} from "@angular/common/http";
 import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-managemodal',
@@ -12,7 +12,8 @@ import {FormsModule} from "@angular/forms";
     MatDialogContent,
     MatDialogTitle,
     CommonModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   templateUrl: './managemodal.component.html',
   styleUrl: './managemodal.component.css'
@@ -20,25 +21,29 @@ import {FormsModule} from "@angular/forms";
 export class ManagemodalComponent {
   uri = environment.API_BASE_URL;
   isSubmitted : boolean = false;
+  manageForm: FormGroup;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { name: string }, private httpClient: HttpClient
-  ) {}
-
+    @Inject(MAT_DIALOG_DATA) public data: { name: string, ticker: string },
+    private httpClient: HttpClient,
+    private builder: FormBuilder
+  ) {
+    this.manageForm = this.builder.group({
+      buy: ['', [Validators.required, Validators.min(0), Validators.max(100)]],
+      sell: ['', [Validators.required, Validators.min(0), Validators.max(100)]],
+      funds_dollar: ['', [Validators.required, Validators.min(1)]]
+    })
+  }
 
   submitData(){
-
-    const buy = document.getElementById('buy');
-    const sell = document.getElementById('sell');
-    const funds_dollar = document.getElementById('funds_dollar');
-
+    const {buy, sell, funds_dollar} = this.manageForm.value;
     let message:JSON = <JSON><unknown>{
       "company": this.data.name,
-      "buy_percent": buy,
+      "ticker": this.data.ticker,
+      "buy_percent": buy ,
       "sell_percent": sell,
       "funds_dollar": funds_dollar,
     };
-
     console.log(message);
     this.sendToLLM(message);
   }

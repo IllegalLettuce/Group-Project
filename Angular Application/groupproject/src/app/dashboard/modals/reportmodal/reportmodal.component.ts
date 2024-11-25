@@ -8,9 +8,9 @@ import {
 } from "@angular/material/dialog";
 import {MatButton} from "@angular/material/button";
 import {firstValueFrom, timeout} from "rxjs";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {environment} from "../../../../environments/environment.development";
-import {CommonModule} from "@angular/common";
+import {CommonModule, NgOptimizedImage} from "@angular/common";
 
 @Component({
   selector: 'app-reportmodal',
@@ -21,7 +21,8 @@ import {CommonModule} from "@angular/common";
     MatButton,
     MatDialogClose,
     MatDialogTitle,
-    CommonModule
+    CommonModule,
+    NgOptimizedImage
   ],
   templateUrl: './reportmodal.component.html',
   styleUrl: './reportmodal.component.css'
@@ -31,6 +32,7 @@ export class ReportmodalComponent implements OnInit{
   response_data: any;
   uri = environment.API_BASE_URL;
   isLoading: boolean = false;
+  ifAnError: boolean = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { name: string }, private httpClient: HttpClient
@@ -44,6 +46,7 @@ export class ReportmodalComponent implements OnInit{
     try {
       await this.generateReport(this.data.name);
     } catch (error) {
+      this.ifAnError = true;
       console.error(error);
     }
   }
@@ -51,7 +54,7 @@ export class ReportmodalComponent implements OnInit{
   /**
    * Async function that is called by the modal to generate a report and show it on the modal.
    * Also controls the loading screen for the generation and the API call
-   * @param name the name of the company that needs a report
+   * @param name the name of the company that needs a report in JSON
    */
   async generateReport(name: string){
     this.isLoading = true;
@@ -63,6 +66,7 @@ export class ReportmodalComponent implements OnInit{
       this.response_data = data;
       console.log(data)
     }catch (error){
+      this.ifAnError = true;
       console.log(error);
     } finally {
       this.isLoading = false;
