@@ -74,25 +74,33 @@ fun ViewFinancialInformationScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = "Company: ${info.company}",
+                                text = "Company: ${info.blog}",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            Text(
-                                text = "Buy Percent: ${info.buy_percent}%",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = "Sell Percent: ${info.sell_percent}%",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = "Funds: \$${info.funds_dollar}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.primary
-                            )
+//                            Text(
+//                                text = "Buy Percent: ${info.buy_percent}%",
+//                                style = MaterialTheme.typography.bodyLarge,
+//                                color = MaterialTheme.colorScheme.onSurface
+//                            )
+//                            Text(
+//                                text = "Sell Percent: ${info.sell_percent}%",
+//                                style = MaterialTheme.typography.bodyLarge,
+//                                color = MaterialTheme.colorScheme.onSurface
+//                            )
+//                            Text(
+//                                text = "Funds: \$${info.funds_dollar}",
+//                                style = MaterialTheme.typography.bodyLarge,
+//                                color = MaterialTheme.colorScheme.primary
+//                            )
+                            Button(
+                                onClick = { viewModel.purchaseStock(info) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
+                            ) {
+                                Text("Purchase")
+                            }
                         }
                     }
                 }
@@ -100,9 +108,6 @@ fun ViewFinancialInformationScreen(
         }
     }
 }
-
-
-
 
 class FinancialInfoViewModel : ViewModel() {
     private val _financialInfo = MutableStateFlow<Stock?>(null)
@@ -125,5 +130,16 @@ class FinancialInfoViewModel : ViewModel() {
             }
         }
     }
+    fun purchaseStock(stock: Stock) {
+        viewModelScope.launch {
+            try {
+                println("Purchased stock: ${stock.blog}")
+//                println("Purchased stock: ${stock.buy_percent}")
+//                println("Purchased stock: ${stock.sell_percent}")
+//                println("Purchased stock: ${stock.funds_dollar}")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }
-
