@@ -1,39 +1,53 @@
 <h2 mat-dialog-title>{{ data.name }}</h2>
 <mat-dialog-content>
-  <div >
-    <form [formGroup]="manageForm" (ngSubmit)="submitData()">
-
-      <label for="buy">Buy Threshold: </label>
-      <input
-        formControlName="buy"
-        type="number"
-        id="buy"
-        name="buy"
-        required
-        min="0"
-        max="100"
-      >
-
-      <label for="sell" >Sell Threshold: </label>
-      <input
-        formControlName="sell"
-        type="number"
-        id="sell"
-        name="sell"
-        required
-        min="0"
-        max="100"
-      >
-
-      <label for="funds_dollar">Capital: </label>
-      <input
-        formControlName="funds_dollar"
-        id="funds_dollar"
-        type="number"
-        min="1"
-        step="any"/>
-
-      <button type="submit" [disabled]="manageForm.invalid">Submit</button>
+  <div *ngIf="!isSubmitted && !ifError" class="dialog-form" id="main">
+    <form [formGroup]="manageForm" (ngSubmit)="sendToLLM()">
+      <div class="form-group">
+        <label for="buy">Buy: </label>
+        <input
+          formControlName="buy"
+          type="text"
+          id="buy"
+          name="buy"
+          required
+          min="0"
+          max="100"
+          pattern="/(^100([.]0{1,2})?)$|(^\d{1,2}([.]\d{1,2})?)$/"
+        >
+      </div>
+      <div class="form-group">
+        <label for="sell">Sell: </label>
+        <input
+          formControlName="sell"
+          type="text"
+          id="sell"
+          name="sell"
+          required
+          min="0"
+          max="100"
+          pattern="/(^100([.]0{1,2})?)$|(^\d{1,2}([.]\d{1,2})?)$/"
+        >
+      </div>
+      <div class="form-group">
+        <label for="funds_dollar">Capital: </label>
+        <input
+          formControlName="funds_dollar"
+          id="funds_dollar"
+          type="text"
+          min="1"
+          step="any"
+          pattern="^\\$?(([1-9](\\d*|\\d{0,2}(,\\d{3})*))|0)(\\.\\d{1,2})?$"
+        />
+      </div>
+      <button type="submit">Submit</button>
     </form>
+  </div>
+
+  <div *ngIf="isSubmitted && ifError" class="dialog-form" id="error">
+    <h2>Error: An error has occurred. Please contact support.</h2>
+  </div>
+
+  <div *ngIf="isSubmitted && !ifError" class="dialog-form" id="sent">
+    <h2>The stock is being managed! You can safely click out of this dialog</h2>
   </div>
 </mat-dialog-content>

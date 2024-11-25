@@ -23,12 +23,21 @@ import {ManagemodalComponent} from "./modals/managemodal/managemodal.component";
 export class DashboardComponent {
 
   public data:any;
+
+  //Temporary stocks data
   stocks = [
-    { name: 'Lockheed Martin', ticker: "NYSE:LMT"},
-    { name: 'Tesla', ticker: "NASDAQ: TSLA"},
-    { name: 'Apple', ticker: "NASDAQ: AAPL"},
-    // Add more companies as needed
+    {name: "Lockheed Martin", ticker: "NYSE:LMT"},
+    {name: "General Dynamics", ticker: "NYSE: GD"},
+    {name: "Northrop Grumman", ticker: "NYSE: NOC"},
+    {name: "Rtx", ticker: "NYSE: RTX"},
+    {name: "Boeing", ticker: "NYSE: BA"},
+    {name: "L3Harris", ticker: "NYSE: LHX"},
+    {name: "Rheinmetall", ticker: "ETR: RHM"},
+    {name: "SAAB", ticker: "STO: SAAB-B"},
+    {name: "Hensoldt", ticker: "ETR: HAG"},
+    {name: "Leonardo", ticker: "BIT: LDO"}
   ];
+
   constructor(private dialog: MatDialog) {}
 
   /**
@@ -37,7 +46,7 @@ export class DashboardComponent {
    */
   openReportDialog(name: string){
     this.dialog.open(ReportmodalComponent, {
-      width: '24em',
+      width: '28em',
       data: { name: name }
     })
   };
@@ -49,7 +58,7 @@ export class DashboardComponent {
    */
   openManageDialog(name: string, ticker: string){
     this.dialog.open(ManagemodalComponent, {
-      width: '24em',
+      width: '28em',
       data: { name: name, ticker: ticker }
     })
   }

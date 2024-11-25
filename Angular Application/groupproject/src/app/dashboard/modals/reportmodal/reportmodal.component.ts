@@ -8,7 +8,7 @@ import {
 } from "@angular/material/dialog";
 import {MatButton} from "@angular/material/button";
 import {firstValueFrom, timeout} from "rxjs";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment.development";
 import {CommonModule, NgOptimizedImage} from "@angular/common";
 
@@ -29,47 +29,31 @@ import {CommonModule, NgOptimizedImage} from "@angular/common";
 })
 export class ReportmodalComponent implements OnInit{
 
-  response_data: any;
+  responseFromLLM: any;
   uri = environment.API_BASE_URL;
-  isLoading: boolean = false;
-  ifAnError: boolean = false;
+  isTheLLMLoading: boolean = false;
+  ifAnErrorHasOccurred: boolean = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { name: string }, private httpClient: HttpClient
   ) {}
 
-  ngOnInit() {
-    this.loadReportData();
-  }
-
-  async loadReportData(): Promise<void> {
-    try {
-      await this.generateReport(this.data.name);
-    } catch (error) {
-      this.ifAnError = true;
-      console.error(error);
-    }
-  }
-
   /**
-   * Async function that is called by the modal to generate a report and show it on the modal.
-   * Also controls the loading screen for the generation and the API call
-   * @param name the name of the company that needs a report in JSON
+   * Calls to the API when modal is loaded
    */
-  async generateReport(name: string){
-    this.isLoading = true;
-    try{
+  async ngOnInit() {
+    const name = this.data.name
+    this.isTheLLMLoading = true;
+    try {
       const uri_report = this.uri + '/report';
-      const data = await firstValueFrom(
-        this.httpClient.post(uri_report, {params: {name}}).pipe(timeout(120000))
+      this.responseFromLLM = await firstValueFrom(
+        this.httpClient.post(uri_report, {params: {name}})
+          .pipe(timeout(120000))
       );
-      this.response_data = data;
-      console.log(data)
-    }catch (error){
-      this.ifAnError = true;
-      console.log(error);
+    } catch (error) {
+      this.ifAnErrorHasOccurred = true;
     } finally {
-      this.isLoading = false;
+      this.isTheLLMLoading = false;
     }
-  };
+  }
 }
