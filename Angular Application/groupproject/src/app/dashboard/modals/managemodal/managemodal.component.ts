@@ -1,9 +1,10 @@
 import {Component, Inject} from '@angular/core';
 import {environment} from "../../../../environments/environment.development";
 import {MAT_DIALOG_DATA, MatDialogContent, MatDialogTitle} from "@angular/material/dialog";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-managemodal',
@@ -12,7 +13,9 @@ import {FormsModule} from "@angular/forms";
     MatDialogContent,
     MatDialogTitle,
     CommonModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './managemodal.component.html',
   styleUrl: './managemodal.component.css'
@@ -20,46 +23,46 @@ import {FormsModule} from "@angular/forms";
 export class ManagemodalComponent {
   uri = environment.API_BASE_URL;
   isSubmitted : boolean = false;
+  ifError: boolean = false;
+  manageForm: FormGroup;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { name: string }, private httpClient: HttpClient
-  ) {}
-
-
-  submitData(){
-
-    const buy = document.getElementById('buy');
-    const sell = document.getElementById('sell');
-    const funds_dollar = document.getElementById('funds_dollar');
-
-    let message:JSON = <JSON><unknown>{
-      "company": this.data.name,
-      "buy_percent": buy,
-      "sell_percent": sell,
-      "funds_dollar": funds_dollar,
-    };
-
-    console.log(message);
-    this.sendToLLM(message);
+    @Inject(MAT_DIALOG_DATA) public data: { name: string, ticker: string },
+    private httpClient: HttpClient,
+    private builder: FormBuilder
+  ) {
+    this.manageForm = this.builder.group({
+      buy: [''],
+      sell: [''],
+      funds_dollar: ['']
+    })
   }
-
 
   /**
    * Called by the modal to make the API call to the backend for the stock management.
    */
-  sendToLLM(message: JSON){
+  sendToLLM(){
     const uri_manage = this.uri + '/manage';
+    const {buy, sell, funds_dollar} = this.manageForm.value;
+    let message:JSON = <JSON><unknown>{
+      "company": this.data.name,
+      "ticker": this.data.ticker,
+      "buy_percent": buy ,
+      "sell_percent": sell,
+      "funds_dollar": funds_dollar,
+    };
     try{
       this.httpClient.post(uri_manage, message)
         .subscribe({
           next: (data: any) => {
-            console.log(data)
-          }, error: (err) => console.log(err)
+          }, error: () => this.ifError = true
         });
-    }catch(error){
-      console.log(error)
-    } finally {
       this.isSubmitted = true;
+    }catch(error){
+      this.ifError = true;
+      if (error instanceof HttpErrorResponse){
+        console.log("Unable to connect to the server. Please check your connection")
+      }
     }
   };
 //////////////////////////////////////////////////////////
