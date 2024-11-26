@@ -4,9 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,12 +34,15 @@ fun PurchaseAssetsScreen() {
         modifier = Modifier
             .fillMaxSize()
     ) {
+        // Background image
         Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
+        // Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -57,11 +58,13 @@ fun PurchaseAssetsScreen() {
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(stocks) { stock ->
-                    StockItem(stock = stock)
+                    StockCard(stock = stock)
                 }
             }
         }
@@ -69,24 +72,37 @@ fun PurchaseAssetsScreen() {
 }
 
 @Composable
-fun StockItem(stock: Stock) {
-    Column(
+fun StockCard(stock: Stock) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 8.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
     ) {
-        Text(
-            text = "${stock.name} (${stock.ticker})",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(
-            onClick = {
-                // Implement purchase logic here
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Text("Purchase ${stock.name}")
+            Text(
+                text = stock.name,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "Ticker: ${stock.ticker}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                },
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text("Purchase")
+            }
         }
     }
 }
