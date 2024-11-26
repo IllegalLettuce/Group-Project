@@ -94,7 +94,8 @@ fun ViewFinancialInformationScreen(
 //                                color = MaterialTheme.colorScheme.primary
 //                            )
                             Button(
-                                onClick = { viewModel.purchaseStock(info) },
+                                onClick = { viewModel.purchaseStock(info)
+                                          },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(top = 8.dp)
