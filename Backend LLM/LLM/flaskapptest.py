@@ -367,235 +367,26 @@ def main():
     # return render_template('index.html', query_input=query_input, output=output)
 
 
-#auto purchase
-@app.route('/manages', methods=['POST','OPTIONS','GET'])
-def maintesing():
-    query_input = None
-    output = None
-
-    if request.method == 'Posts':
-        # Ensure the request contains JSON data
-        if request.content_type != 'application/json':
-            return jsonify({
-                "status": "error",
-                "message": "Content-Type must be application/json"
-            }), 42069
-
-    if request.method == 'GET':
-        # Ensure the request contains JSON data
-
-        return jsonify({
-            "company": "NewCOmpz",
-            "buy_percent": 50,
-            "sell_percent":50,
-            "funds_dollar":100
-        }), 200
-        if request.content_type != 'application/json':
-            return jsonify({
-                "status": "error",
-                "message": "Content-Type must be application/json"
-            }), 42069
 
 
-    if request.method == 'POST':
-
-        # test at home
-        # query_input = request.form.get('query-input')
-
-        # actual implementation
-        query_input = request.data.ty
-        companyname = query_input.get('company', None)
-        print(companyname)
-
-        if query_input:
-
-
-            ##TESTING
-
-            # resp = '{"hello":"WAASASASA"}'
-            # jsonobject = json.loads(resp)
-            return str(companyname)
-            try:
-
-                researcher_task = Task(
-                    description="Research financial data for " + str(
-                        query_input) + " using yahoo finance news as of todays date",
-                    agent=researcher_agent,
-                    expected_output="Latest financial insights for making predictions."
-                )
-
-                accountant_task = Task(
-                    description=f"Calculate accounting ratios for the company,{researcher_task}",
-                    agent=accountant_agent,
-                    expected_output="""A summary of financial leverage, such as debt-to-equity ratio.
-    
-                        {      
-                            "stock_symbol": str,
-                            "financial_metrics": {
-                                "pe_ratio": float,
-                                "debt_to_equity": float,
-                                "current_ratio": float,
-                                "profit_margin": float
-                            },
-                            "cash_flow_analysis": {
-                                "operating_cash_flow": float,
-                                "free_cash_flow": float
-                            },
-                            "growth_metrics": {
-                                "revenue_growth": float,
-                                "earnings_growth": float
-                            }
-                        }
-                        """,
-                    dependency=[researcher_task]
-
-                )
-
-                recommender_task = Task(
-                    description=f"Generate stock recommendations based on financial analysis {accountant_task}",
-                    agent=recommender_agent,
-                    expected_output="""
-                        {
-                            "recommendation": {
-                                "stock_symbol": str,
-                                "action": "BUY" | "HOLD" | "SELL",
-                                "target_price": float,
-                                "position_size": float,
-                                "risk_level": str,
-                                "rationale": str,
-                                "supporting_metrics": {
-                                    "technical_indicators": dict,
-                                    "fundamental_factors": dict,
-                                    "risk_metrics": dict
-                                },
-                                "entry_strategy": str,
-                                "exit_criteria": str,
-                                "timeline": str
-                            },
-                            "market_context": {
-                                "current_market_conditions": str,
-                                "sector_analysis": str,
-                                "relevant_news": list
-                            },
-                            "risk_assessment": {
-                                "potential_upside": float,
-                                "potential_downside": float,
-                                "risk_reward_ratio": float
-                            }
-                        }
-                        """,
-                    dependencies=[accountant_task]
-                )
-
-                blogger_task = Task(
-                    description=f"{recommender_task}",
-                    agent=blogger_agent,
-                    # expected_output="A very short informative detailed blog about how well a company is doing, and recommended percentages for buy|sell|hold"
-                    expected_output="A very short informative detailed blog about how well a company is doing (about 20 words), and recommended percentages for buy|sell|hold which would be in the format of Buy : x% , Hold: y% , Sell: z% (dont write anything extra, and output it in this Json format"
-                                    "{"
-                                    '"blog": "{Informative detailed blog goes here}",'
-                                    ' "recommendation": {'
-                                    '"buy"": "x%",'
-                                    '"hold": "y%",'
-                                    '"sell": "z%"'
-                                    " },"
-                                    '"date":(date from which you got this information from)'
-                                    " }"
-
-                )
-                crew = Crew(agents=[researcher_agent, accountant_agent, blogger_agent],
-                            tasks=[researcher_task, accountant_task, blogger_task], verbose=True)
-                result = crew.kickoff()
-
-                result = str(result)
-
-                print(result)
-
-                output = format_output(result)
-                # for json
-                jsonobject = json.loads(output)
-                # actual implementation
-                return jsonobject
-
-
-
-            except Exception as e:
-                logging.error(f"Error during task execution: {e}")
-                output = "Sorry, an error occurred while processing your request."
-
-    # else:
-    #     return 'Welcome! Send a POST request to submit data.', 200
-
-    # test at home
-    # return render_template('index.html', query_input=query_input, output=output)
-
-
-
+#this will be the autopurchase when its done
 @app.route('/manage', methods=['POST', 'OPTIONS'])
 def maintes():
-    if request.method == 'POST':
-        # Log the Content-Type header
-        print(f"Content-Type received: {request.content_type}")
-        if request.content_type != 'application/json':
-            return jsonify({
-                "status": "error",
-                "message": "Content-Type must be application/json"
-            }), 200
 
-        else:
-            # Example success response for valid JSON POST request
-
-            data = request.get_json()
-            company = data.get('company')
-            # buy = data.get('buy_percent')
-            # sell = data.get('sell_percent')
-            # funds = data.get('funds_dollar')
-
-
-            return jsonify({
-                "status": "success",
-                "message": company
-            }), 200
-
-    elif request.method == 'OPTIONS':
-        # Respond to preflight requests if needed
-        return jsonify({
-            "status": "info",
-            "message": "OPTIONS request received"
-        }), 200
-
-    # Fallback for unexpected cases
     return jsonify({
-        "status": "error",
-        "message": "Unexpected method"
-    }), 400
+        "status": "request received",
+        "message": "Hi"
+    }), 200
 
 
 
 
-#report
-@app.route('/report', methods=['POST','GET'])
-def reporttes():
-    query_input = None
-    output = None
 
-    if request.method == 'POST':
-        # Ensure the request contains JSON data
-        return jsonify({
-            "status": "OK",
-            "response": "POST request received"
-        }), 200
-
-
-    if request.method == 'GET':
-        # Ensure the request contains JSON data
-
-        return "Post Request Recived", 200
 
 import datetime
 date = datetime.datetime.now()
 
-
+# this is for testing stuff at home it you dont need to comment stuff out
 @app.route('/', methods=['GET', 'POST'])
 def home():
     query_input = None
