@@ -42,7 +42,7 @@ export class ManagemodalComponent {
       ],
       funds_dollar: ['',
         [Validators.required,
-          Validators.pattern(/^\$?([1-9]\d{0,2}(,\d{3})*|0)(\.\d{1,2})?$/)]
+          Validators.pattern(/^\$?([1-9]\d*(,\d{3})*|0)(\.\d{1,2})?$/)]
       ],
     });
   }
