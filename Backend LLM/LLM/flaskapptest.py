@@ -33,6 +33,7 @@ os.environ["OPENAI_MODEL_NAME"] = "llama3-70b-8192"
 os.environ["GROQ_API_KEY"] = config.groqapiekey
 os.environ["GOOGLE_API_KEY"] = config.googleapikey
 os.environ["GEMINI_API_KEY"] = config.googleapikey
+os.environ["OTEL_SDK_DISABLED"] = "true" ## to get rid of that telemetry error at after executing agent tasks
 
 # web_rag_tool = WebsiteSearchTool()
 
