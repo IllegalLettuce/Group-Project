@@ -39,9 +39,6 @@ import com.example.myapplication.screens.RegisterScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.firebase.FirebaseApp
 import android.content.Context
-import android.content.SharedPreferences
-import com.example.myapplication.screens.LLMPredictionScreen
-import com.example.myapplication.screens.ViewFinancialInformationScreen
 
 
 
@@ -68,7 +65,6 @@ fun MainApp() {
     val startDestination = if (isUserLoggedIn(navController.context)) Screen.Home.route else Screen.Login.route
     var selectedIndex by rememberSaveable { mutableStateOf(0) }
 
-    // Get the current route to conditionally show the Bottom Navigation Bar
     val currentRoute = navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry).value?.destination?.route
 
     val navItemList = listOf(
@@ -104,7 +100,7 @@ fun MainApp() {
             }
         }
     ) { innerPadding ->
-        // Set up the navigation graph with a dynamic start destination
+
         NavHost(
             navController = navController,
             startDestination = startDestination,
@@ -119,8 +115,6 @@ fun MainApp() {
             composable(Screen.HelpSupport.route) { HelpSupportScreen(navController) }
             composable(Screen.RatingReviewScreen.route) { RatingReviewScreen(navController) }
             composable(Screen.PurchasePremiumFunctionality.route) { PurchasePremiumFunctionality(navController) }
-            composable(Screen.ViewFinancialInformationScreen.route) { ViewFinancialInformationScreen() }
-            composable(Screen.LLMPredictionScreen.route) { LLMPredictionScreen() }
         }
     }
 }

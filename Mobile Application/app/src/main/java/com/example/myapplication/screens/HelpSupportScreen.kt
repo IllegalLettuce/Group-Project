@@ -14,7 +14,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -70,7 +69,7 @@ fun HelpSupportScreen(navController: NavHostController, modifier: Modifier = Mod
                 label = { Text("First Name") },
                 modifier = Modifier.fillMaxWidth(),
 
-            )
+                )
 
             Spacer(modifier = Modifier.height(16.dp))
 

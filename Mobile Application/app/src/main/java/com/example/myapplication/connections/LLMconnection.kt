@@ -3,6 +3,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -73,4 +74,40 @@ class StockViewModel : ViewModel() {
     }
 }
 
+
+
+class FinancialInfoViewModel : ViewModel() {
+    private val _financialInfo = MutableStateFlow<Stock?>(null)
+    val financialInfo: StateFlow<Stock?> get() = _financialInfo
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    fun fetchFinancialData(query: String) {
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.getStockInfo(query)
+                _financialInfo.value = response
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _financialInfo.value = null
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+    fun purchaseStock(stock: Stock) {
+        viewModelScope.launch {
+            try {
+                println("Purchased stock: ${stock.blog}")
+//                println("Purchased stock: ${stock.buy_percent}")
+//                println("Purchased stock: ${stock.sell_percent}")
+//                println("Purchased stock: ${stock.funds_dollar}")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+}
 
