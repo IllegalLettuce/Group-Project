@@ -10,9 +10,6 @@
           id="buy"
           name="buy"
           required
-          min="0"
-          max="100"
-          pattern="/(^100([.]0{1,2})?)$|(^\d{1,2}([.]\d{1,2})?)$/"
         >
       </div>
       <div class="form-group">
@@ -22,10 +19,6 @@
           type="text"
           id="sell"
           name="sell"
-          required
-          min="0"
-          max="100"
-          pattern="/(^100([.]0{1,2})?)$|(^\d{1,2}([.]\d{1,2})?)$/"
         >
       </div>
       <div class="form-group">
@@ -34,17 +27,14 @@
           formControlName="funds_dollar"
           id="funds_dollar"
           type="text"
-          min="1"
-          step="any"
-          pattern="^\\$?(([1-9](\\d*|\\d{0,2}(,\\d{3})*))|0)(\\.\\d{1,2})?$"
         />
       </div>
-      <button type="submit">Submit</button>
+      <button type="submit" [disabled]="manageForm.invalid">Manage</button>
     </form>
   </div>
 
   <div *ngIf="isSubmitted && ifError" class="dialog-form" id="error">
-    <h2>Error: An error has occurred. Please contact support.</h2>
+    <h2>Error: An error has occurred. Please contact support. No funds have been transferred.</h2>
   </div>
 
   <div *ngIf="isSubmitted && !ifError" class="dialog-form" id="sent">

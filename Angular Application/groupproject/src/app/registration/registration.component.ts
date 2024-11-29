@@ -1,41 +1,48 @@
-// https://medium.com/@ojiofor/angular-reactive-forms-strong-password-validation-8dbcce92eb6c
-// https://stackoverflow.com/questions/71765341/confirm-password-validation-in-angular
-import { Component } from '@angular/core';
-import {NavbarComponent} from "../navbar/navbar.component";
-import {RouterLink} from "@angular/router";
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {getAuth, createUserWithEmailAndPassword} from "firebase/auth";
-import {NgIf} from "@angular/common";
-
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 
 @Component({
   selector: 'app-registration',
   standalone: true,
-  imports: [
-    NavbarComponent,
-    RouterLink,
-    ReactiveFormsModule,
-    NgIf
-  ],
   templateUrl: './registration.component.html',
-  styleUrl: './registration.component.css'
+  styleUrls: ['./registration.component.css'],
+  imports: [ReactiveFormsModule]
 })
-export class RegistrationComponent {
+export class RegistrationComponent implements OnInit {
   registerForm: FormGroup;
   StrongPasswordRegx: RegExp = /^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=\D*\d).{8,}$/;
+  paymentSuccess: boolean = false;
 
-  constructor(private builder: FormBuilder) {
-
+  constructor(
+    private builder: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.registerForm = this.builder.group({
       name: ['', Validators.required],
       surname: ['', Validators.required],
-      email: ['', Validators.required],
-      password: ['', Validators.required, Validators.pattern(this.StrongPasswordRegx)],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.pattern(this.StrongPasswordRegx)]],
       confirmPassword: ['', Validators.required]
-    },{
-      validators: this.ConfirmedValidator('password', 'confirmPassword')
+    }, {
+      validators: this.ConfirmedValidator("password", "confirmPassword")
+    });
+  }
+
+  ngOnInit(): void {
+    const savedFormData = localStorage.getItem("registrationForm");
+    if (savedFormData) {
+      this.registerForm.setValue(JSON.parse(savedFormData));
+    }
+
+    this.route.queryParams.subscribe(params => {
+      this.paymentSuccess = params["paymentSuccess"] === "true";
+      if (this.paymentSuccess) {
+        this.registerUser();
       }
-    )
+    });
   }
 
   ConfirmedValidator(controlName: string, matchingControlName: string) {
@@ -44,7 +51,7 @@ export class RegistrationComponent {
       const matchingControl = formGroup.controls[matchingControlName];
       if (
         matchingControl.errors &&
-        !matchingControl.errors['confirmedValidator']
+        !matchingControl.errors["confirmedValidator"]
       ) {
         return;
       }
@@ -53,18 +60,31 @@ export class RegistrationComponent {
       } else {
         matchingControl.setErrors(null);
       }
-    }
+    };
   }
 
-
-
+  goToPayPal() {
+    localStorage.setItem("registrationForm", JSON.stringify(this.registerForm.value));
+    const paymentAmount = "20.00"; // Replace with dynamic amount if needed
+    this.router.navigate(["/paypal"], { queryParams: { amount: paymentAmount } });
+  }
 
   registerUser() {
-    const {email, password} = this.registerForm.value;
+    if (!this.paymentSuccess) {
+      alert("Payment not completed. Please pay first.");
+      return;
+    }
+
+
+    const { email, password } = this.registerForm.value;
+    console.log(email);
     const auth = getAuth();
-    createUserWithEmailAndPassword(auth, email, password).then((result) => {
-      const user = result.user;
-      window.location.replace("/dashboard")
-    }).catch(console.log)
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(result => {
+        localStorage.removeItem('registrationForm');
+        window.location.replace("/dashboard");
+      })
+      .catch(console.log);
   }
 }
+
