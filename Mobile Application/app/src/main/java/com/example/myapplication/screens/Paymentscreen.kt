@@ -1,5 +1,4 @@
 package com.example.myapplication.screens
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,7 +46,7 @@ fun PaymentScreen(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            TextButton(onClick = { /* Pop Up Screen with Payement*/  }) {
+            TextButton(onClick = {   }) {
                 Text("Proceed to Payment")
             }
         }

@@ -12,20 +12,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +41,7 @@ import com.example.myapplication.navigation.Screen
 fun HomeScreen(navController: NavHostController, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf("Options") }
-    val menuOptions = listOf("Help/Support", "Rating/Review", "PurchasePremium","LLMPrediction","ViewInformation")
+    val menuOptions = listOf("Rating", "Premium")
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -88,12 +83,13 @@ fun HomeScreen(navController: NavHostController, modifier: Modifier = Modifier) 
                                 selectedOption = option
                                 expanded = false
                                 when (option) {
-                                    "Help/Support" -> { navController.navigate(Screen.HelpSupport.route) }
-                                    "Rating/Review" -> { navController.navigate(Screen.RatingReviewScreen.route) }
-                                    "PurchasePremium" -> { navController.navigate(Screen.PurchasePremiumFunctionality.route) }
-                                    "LLMPrediction" -> { navController.navigate(Screen.LLMPredictionScreen.route) }
-                                    "ViewInformation" -> { navController.navigate(Screen.ViewFinancialInformationScreen.route) }
-                                    "Logout" -> { /* Logout Logic here maybe? */ }
+                                    "Rating" -> {
+                                        navController.navigate(Screen.RatingReviewScreen.route)
+                                    }
+
+                                    "Premium" -> {
+                                        navController.navigate(Screen.PurchasePremiumFunctionality.route)
+                                    }
                                 }
                             }
                         )
@@ -113,13 +109,13 @@ fun HomeScreen(navController: NavHostController, modifier: Modifier = Modifier) 
                     IconButton(onClick = { navController.navigate(Screen.PriceAlert.route) }) {
                         Icon(
                             imageVector = Icons.Filled.Notifications,
-                            contentDescription = "Price Alert",
+                            contentDescription = "Alert",
                             tint = Color.White,
                             modifier = Modifier.size(48.dp)
                         )
                     }
                     Text(
-                        text = "Price Alert",
+                        text = "Alert",
                         color = Color.White,
                         modifier = Modifier.padding(top = 8.dp)
                     )
@@ -129,14 +125,14 @@ fun HomeScreen(navController: NavHostController, modifier: Modifier = Modifier) 
                 ) {
                     IconButton(onClick = { navController.navigate(Screen.PurchaseAssets.route) }) {
                         Icon(
-                            imageVector = Icons.Filled.AddCircle,
-                            contentDescription = "Purchase",
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = "Stocks",
                             tint = Color.White,
                             modifier = Modifier.size(48.dp)
                         )
                     }
                     Text(
-                        text = "Purchase",
+                        text = "Stocks",
                         color = Color.White,
                         modifier = Modifier.padding(top = 8.dp)
                     )
