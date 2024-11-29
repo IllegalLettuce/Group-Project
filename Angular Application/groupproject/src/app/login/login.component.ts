@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import {RouterLink} from "@angular/router";
-import {getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword} from "firebase/auth";
-import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
-
+import { RouterLink } from "@angular/router";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
+import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
 
 @Component({
   selector: 'app-login',
@@ -12,7 +11,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
     ReactiveFormsModule
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
 
@@ -25,23 +24,23 @@ export class LoginComponent {
     })
   }
 
-
-
   provider = new GoogleAuthProvider();
-  googleLogin(){
-    const auth = getAuth();
-    signInWithPopup(auth, this.provider).then((result) =>{
+
+  googleLogin() {
+    const auth = getAuth(); // Firebase is initialized globally
+    signInWithPopup(auth, this.provider).then((result) => {
       const user = result.user;
       window.location.replace('/dashboard')
     }).catch(console.log)
   }
 
   emailLogin() {
-      const {email, password} = this.loginForm.value;
-      const auth = getAuth();
-      signInWithEmailAndPassword(auth, email, password).then((result) => {
-        const user = result.user;
-        window.location.replace("/dashboard")
-      }).catch(console.log)
-    }
+    const { email, password } = this.loginForm.value;
+    const auth = getAuth(); // Firebase is initialized globally
+    signInWithEmailAndPassword(auth, email, password).then((result) => {
+      const user = result.user;
+      window.location.replace("/dashboard")
+    }).catch(console.log)
+  }
 }
+

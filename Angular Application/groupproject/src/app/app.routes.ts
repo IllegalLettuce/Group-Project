@@ -9,7 +9,7 @@ import {PaypalComponent} from "./paypal/paypal.component";
 
 
 export const routes: Routes = [
-  {path: '', component: LoginComponent},
+  {path: '', component: LoginComponent, canActivate:[authGuard]},
   {path: 'registration', component: RegistrationComponent},
   {path: 'dashboard', component: DashboardComponent, canActivate:[authGuard]},
   {path: 'dasboardmanager', component: DashboardmanagerComponent, canActivate:[authGuard]},

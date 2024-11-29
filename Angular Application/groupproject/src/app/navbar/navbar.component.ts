@@ -14,6 +14,10 @@ import { getAuth, signOut } from "firebase/auth";
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
+  auth = getAuth();
+  user = this.auth.currentUser;
+  username = this.user?.displayName;
+
 
   logout(){
     const auth = getAuth();
