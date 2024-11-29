@@ -32,10 +32,19 @@ export class ManagemodalComponent {
     private builder: FormBuilder
   ) {
     this.manageForm = this.builder.group({
-      buy: [''],
-      sell: [''],
-      funds_dollar: ['']
-    })
+      buy: ['',
+        [Validators.required,
+          Validators.pattern(/^100(\.0{1,2})?$|^\d{1,2}(\.\d{1,2})?$/)],
+      ],
+      sell: ['',
+        [Validators.required,
+          Validators.pattern(/^100(\.0{1,2})?$|^\d{1,2}(\.\d{1,2})?$/)],
+      ],
+      funds_dollar: ['',
+        [Validators.required,
+          Validators.pattern(/^\$?([1-9]\d*(,\d{3})*|0)(\.\d{1,2})?$/)]
+      ],
+    });
   }
 
   /**
