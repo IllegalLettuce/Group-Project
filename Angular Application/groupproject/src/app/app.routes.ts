@@ -14,7 +14,7 @@ export const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent, canActivate:[authGuard]},
   {path: 'dasboardmanager', component: DashboardmanagerComponent, canActivate:[authGuard]},
   {path: 'helpsupport', component: HelpsupportComponent, canActivate:[authGuard]},
-  {path: 'paypal', component: PaypalComponent, canActivate:[authGuard]},
+  {path: 'paypal', component: PaypalComponent},
   {path: '**', redirectTo: ''}
 ];
 
