@@ -15,9 +15,10 @@ import re
 from crewai import Agent, Task, Crew, LLM
 from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
-from crewai_tools import (
-    WebsiteSearchTool
-)
+import yfinance as yf
+# from crewai_tools import (
+#     WebsiteSearchTool
+# )
 
 
 # Import required modules from langchain_community, crewai, etc.
@@ -41,7 +42,21 @@ app = Flask(__name__)
 CORS(app)
 logging.basicConfig(level=logging.DEBUG)
 
+##################################################################
+#yfinance stocks 
 
+stocks = [
+    {"name": "Lockheed Martin", "ticker": "LMT"},
+    {"name": "General Dynamics", "ticker": "GD"},
+    {"name": "Northrop Grumman", "ticker": "NOC"},
+    {"name": "RTX", "ticker": "RTX"},
+    {"name": "Boeing", "ticker": "BA"},
+    {"name": "L3Harris", "ticker": "LHX"},
+    {"name": "Rheinmetall", "ticker": "RHM.DE"},
+    {"name": "SAAB", "ticker": "SAAB-B.ST"},
+    {"name": "Hensoldt", "ticker": "HAG.DE"},
+    {"name": "Leonardo", "ticker": "LDO.MI"},
+]
 
 
 
@@ -100,8 +115,10 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 ##r is necessary to tell python that its a file path
-cred = credentials.Certificate(r"C:\Users\spenc\Desktop\MTU stuff\Software Dev Year 3\Semester 1\Group Project\firebasekey\year3groupproject-ee682-firebase-adminsdk-zdtvf-2484fe8f8a.json")
-
+#############################################################################################################################################
+cred = credentials.Certificate(r"C:\Users\rthar\OneDrive\Desktop\firebase llm copy\firebasekey.json")#rory firebase key
+cred = credentials.Certificate(r"C:\Users\spenc\Desktop\MTU stuff\Software Dev Year 3\Semester 1\Group Project\firebasekey\year3groupproject-ee682-firebase-adminsdk-zdtvf-2484fe8f8a.json")#ferenc firebase key
+#################################################################################################################################################
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -210,6 +227,80 @@ def autopurchase():
         # except Exception as e:
         #     logging.error(f"Error during task execution: {e}")
         #     output = "Sorry, an error occurred while processing your request."
+
+
+#############################################################################################
+def fetch_intraday_data_yahoo(ticker, interval="15m", period="5d"):
+    try:
+        stock = yf.Ticker(ticker)
+        hist = stock.history(interval=interval, period=period)
+        
+        if hist.empty:
+            print(f"No intraday data found for {ticker}.")
+            return None
+
+        data = hist[["Open", "High", "Low", "Close", "Volume"]].to_dict(orient="index")
+        
+        formatted_data = {
+            date.strftime("%Y-%m-%d %H:%M:%S"): {
+                "Open": float(values["Open"]),
+                "High": float(values["High"]),
+                "Low": float(values["Low"]),
+                "Close": float(values["Close"]),
+                "Volume": int(values["Volume"]),
+            }
+            for date, values in data.items()
+        }
+        
+        return formatted_data
+    
+    except Exception as e:
+        print(f"Error fetching intraday data for {ticker}: {e}")
+        return None
+    
+def get_stock_data(stock_symbol):
+    """Fetch the latest stock data using Yahoo Finance."""
+    try:
+        stock = yf.Ticker(stock_symbol)
+        latest_prices = stock.history(period='7d')['Close'].tolist()
+        return latest_prices
+    except Exception as e:
+        logging.error(f"Error fetching stock data for {stock_symbol}: {e}")
+        return None
+
+# Add a new route for stock data
+@app.route('/stock', methods=['GET', 'POST'])
+def stock_recommendation():
+    if request.method == 'POST':
+        data = request.get_json()
+        stock_symbol = data.get("companay_ticker")  # Note: there's a typo in the original (companay)
+
+        if stock_symbol:
+            latest_prices = get_stock_data(stock_symbol)
+
+            if latest_prices:
+                output = f"The latest closing prices for {stock_symbol} over the past 7 days are: {latest_prices}. Use this data for financial recommendations."
+            else:
+                output = "Failed to fetch the latest stock prices."
+        else:
+            output = "Stock symbol not found in accountant_task result."
+
+        return output
+
+# Add a function to fetch and save stock data
+def main_stock_data():
+    stock_data = {}
+    for stock in stocks:
+        print(f"Fetching 15-minute interval data for {stock['ticker']}...")
+        data = fetch_intraday_data_yahoo(stock["ticker"], interval="15m", period="5d")
+        if data:
+            stock_data[stock["name"]] = data
+
+    output_filename = "stock_data.json"
+    with open(output_filename, "w") as json_file:
+        json.dump(stock_data, json_file, indent=2)
+    print(f"Data saved to {output_filename}")
+
 
 
 
@@ -605,4 +696,5 @@ def home():
 
 
 if __name__ == '__main__':
+    main_stock_data()
     app.run(debug=True)
