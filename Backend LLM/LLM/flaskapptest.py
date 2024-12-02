@@ -3,13 +3,9 @@ import os
 import json
 import time
 
-# from google.cloud.firestore_v1 import FieldFilter
+from google.cloud.firestore_v1 import FieldFilter
 # from sagemaker.workflow.airflow import processing_config
 # from sympy import false
-
-import datetime
-
-from sympy.physics.units import temperature
 
 import config
 from flask import Flask, request, render_template, jsonify
@@ -228,7 +224,7 @@ def main():
     output = None
 
 
-    if request.method == 'POST' or request.method == 'GET':
+    if request.method == 'POST':
 
         # test at home
         # query_input = request.form.get('query-input')
@@ -324,7 +320,7 @@ def main():
                 blogger_task = Task(
                     description=f"{recommender_task}",
                     agent=blogger_agent,
-                    # expected_output="A very short informative detailed blog about how well a company is doing, and recommended percentages for buy|sell|hold"
+
                     expected_output="A very short informative detailed blog about how well a company is doing (about 20 words), and recommended percentages for buy|sell|hold which would be in the format of Buy : x% , Hold: y% , Sell: z% (dont write anything extra, and output it in this Json format"
                                     "{"
                                     '"blog": "{Informative detailed blog goes here}",'
@@ -378,6 +374,79 @@ def maintes():
         "status": "request received",
         "message": "Hi"
     }), 200
+
+
+
+@app.route('/buyandsell', methods=['POST','OPTIONS'])
+def burorsell():
+    if request.method == "POST":
+        # query_input = request.data
+        # actual implementation
+        datainput = json.loads(request.data.decode('utf-8'))
+        # query_input = request.data
+        ticker = datainput.get('ticker')
+        amount = datainput.get('amount')
+        userid = datainput.get('userid')
+        burorsell = datainput.get('buy')
+        try:
+            docs = (
+                    db.collection("shares")
+                    .where(filter=FieldFilter("user_id", "==", userid) and FieldFilter("ticker", "==", ticker) )
+                    .stream()
+                )
+
+            docs = list(docs)
+
+            shares_owned = 0
+            document_id = 0
+            if docs:
+                for doc in docs:
+                    shares_owned = doc.get('shares_owned')
+                    document_id = doc.id
+            if document_id != 0:
+                db.collection("shares").document(document_id).create({"user_id":userid , "ticker": ticker, "shares_owned": amount})
+                return jsonify({
+                    "status": "Success",
+                    "message": "You purchased "+str(amount)+" "+ticker+" stocks"
+                }), 200
+            else:
+                
+                if burorsell == 'buy':
+                    shares_owned += amount
+                    db.collection("shares").document(document_id).set({ "shares_owned": shares_owned,}, merge=True)
+
+                    return jsonify({
+                        "status": "Success",
+                     "message": "You purchased "+str(amount)+" "+ticker+" stocks.\nNow you own "+str(shares_owned)+" stocks."
+                    }), 200
+                else:
+                    if amount > shares_owned:
+                        return jsonify({
+                            "status": "Error",
+                            "message": "You cannot sell more shares than what you have"
+                        }), 200
+                    else:
+                        shares_owned -= amount
+                        if shares_owned > 0 :
+                            db.collection("shares").document(document_id).set({ "shares_owned": shares_owned,}, merge=True)
+                            return jsonify({
+                                "status": "Success",
+                                "message": "You sold "+str(amount)+" "+ticker+" stocks.\nNow you own "+str(shares_owned)+" stocks."
+                            }), 200
+                        else:
+                            db.collection("shares").document(document_id).delete()
+                            return jsonify({
+                                "status": "Success",
+                                "message": "You sold all your "+ticker+" stocks."
+                            }), 200
+
+
+
+
+
+        except Exception as e:
+            logging.error(f"Error during task execution: {e}")
+
 
 
 
