@@ -64,6 +64,8 @@ fun MainApp() {
     val navController = rememberNavController()
     val startDestination = if (isUserLoggedIn(navController.context)) Screen.Home.route else Screen.Login.route
     var selectedIndex by rememberSaveable { mutableStateOf(0) }
+    val userId = getUserId(navController.context)
+
 
     val currentRoute = navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry).value?.destination?.route
 
@@ -117,6 +119,11 @@ fun MainApp() {
             composable(Screen.PurchasePremiumFunctionality.route) { PurchasePremiumFunctionality(navController) }
         }
     }
+}
+
+fun getUserId(context: Context): String? {
+    val sharedPref = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    return sharedPref.getString("user_id", null)
 }
 
 

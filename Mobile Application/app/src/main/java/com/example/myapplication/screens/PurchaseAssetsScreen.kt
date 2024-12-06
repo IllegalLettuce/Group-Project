@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,15 +18,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.database.getCurrentUserId
 
 
 data class Stock(val name: String, val ticker: String)
 
 @Composable
 fun PurchaseAssetsScreen(viewModel: FinancialInfoViewModel = viewModel()) {
+
+    val userId = getCurrentUserId()
     val stocks = listOf(
         Stock(name = "Lockheed Martin", ticker = "NYSE:LMT"),
         Stock(name = "General Dynamics", ticker = "NYSE:GD"),
@@ -39,14 +44,15 @@ fun PurchaseAssetsScreen(viewModel: FinancialInfoViewModel = viewModel()) {
         Stock(name = "Leonardo", ticker = "BIT:LDO")
     )
 
-    var showDialog by remember { mutableStateOf(false) }
+    var showInfoDialog by remember { mutableStateOf(false) }
+    var showPurchaseDialog by remember { mutableStateOf(false) }
     var selectedStock by remember { mutableStateOf<Stock?>(null) }
+    var showSellDialog by remember { mutableStateOf(false) }
+    var showPriceDialog by remember { mutableStateOf(false)}
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
-        // Background image
         Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = null,
@@ -79,26 +85,75 @@ fun PurchaseAssetsScreen(viewModel: FinancialInfoViewModel = viewModel()) {
                         stock = stock,
                         onInformationClick = {
                             selectedStock = stock
-                            showDialog = true
+                            showInfoDialog = true
+                        },
+                        onPurchaseClick = {
+                            selectedStock = stock
+                            showPurchaseDialog = true
+                        },
+                        onSellClick = {
+                            selectedStock = stock
+                            showSellDialog = true
+                        },
+                        onPriceClick = {
+                            selectedStock = stock
+                            showPriceDialog = true
                         }
                     )
                 }
             }
         }
 
-        // Show the dialog if triggered
-        if (showDialog) {
+        if (showInfoDialog) {
             FinancialInfoDialog(
                 stock = selectedStock,
                 viewModel = viewModel,
-                onDismiss = { showDialog = false }
+                onDismiss = { showInfoDialog = false }
             )
+        }
+
+        if (showPurchaseDialog) {
+            selectedStock?.let {
+                if (userId != null) {
+                    PurchaseDialog(
+                        stock = it,
+                        userId = userId,
+                        viewModel = viewModel,
+                        onDismiss = { showPurchaseDialog = false }
+                    )
+                }
+            }
+        }
+        if (showSellDialog) {
+            selectedStock?.let {
+                if (userId != null) {
+                    SellDialogue(
+                        stock = it,
+                        userId = userId,
+                        viewModel = viewModel,
+                        onDismiss = { showSellDialog = false }
+                    )
+                }
+            }
+        }
+        if (showPriceDialog) {
+            selectedStock?.let {
+                if (userId != null) {
+                    PriceDialogue(
+                        stock = it,
+                        userId = userId,
+                        viewModel = viewModel,
+                        onDismiss = { showPriceDialog = false }
+                    )
+                }
+            }
         }
     }
 }
 
+
 @Composable
-fun StockCard(stock: Stock, onInformationClick: () -> Unit) {
+fun StockCard(stock: Stock, onInformationClick: () -> Unit, onPurchaseClick: (Stock) -> Unit, onSellClick: (Stock) -> Unit,onPriceClick: (Stock) -> Unit ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -121,25 +176,27 @@ fun StockCard(stock: Stock, onInformationClick: () -> Unit) {
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-            Row(){
-
-            Button(
-                onClick = {
-                },
-            ) {
-                Text("Purchase")
-            }
-            Button(
-                onClick = onInformationClick,
-            ) {
-                Text("Information")
-            }
-            Button(
-                onClick = {
-                },
-            ) {
-                Text("Sell")
-            }
+            Row {
+                TextButton(
+                    onClick = { onPurchaseClick(stock) },
+                ) {
+                    Text("Purchase")
+                }
+                TextButton(
+                    onClick = onInformationClick,
+                ) {
+                    Text("Information")
+                }
+                TextButton(
+                    onClick = {onSellClick(stock)},
+                ) {
+                    Text("Sell")
+                }
+                TextButton(
+                    onClick = {onPriceClick(stock)},
+                ) {
+                    Text("Alert")
+                }
             }
         }
     }
@@ -172,7 +229,6 @@ fun FinancialInfoDialog(
                 financialInfo.value?.let { info ->
                     Column {
                         Text(text = "Company: ${info.blog}")
-                        // Add other financial details here
                     }
                 } ?: Text(text = "Unable to fetch financial data.")
             }
@@ -184,4 +240,185 @@ fun FinancialInfoDialog(
         }
     )
 }
+
+@Composable
+fun PurchaseDialog(
+    stock: Stock,
+    userId: String,
+    viewModel: FinancialInfoViewModel,
+    onDismiss: () -> Unit
+) {
+    var amount by remember { mutableStateOf("") }
+    val isAmountValid = amount.toIntOrNull() != null && amount.toInt() > 0
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Purchase ${stock.name}") },
+        text = {
+            Column {
+                Text("Enter the amount of shares:")
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { Text("Amount") },
+                    isError = !isAmountValid && amount.isNotEmpty(),
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                )
+                if (!isAmountValid && amount.isNotEmpty()) {
+                    Text(
+                        text = "Please enter a valid positive number.",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (isAmountValid) {
+                        viewModel.manageStock(
+                            ticker = stock.ticker,
+                            userId = userId,
+                            amount = amount.toInt(),
+                            action = "buy",
+                            price = null
+                        )
+                        onDismiss()
+                    }
+                },
+                enabled = isAmountValid
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun SellDialogue(
+    stock: Stock,
+    userId: String,
+    viewModel: FinancialInfoViewModel,
+    onDismiss: () -> Unit
+) {
+    var amount by remember { mutableStateOf("") }
+    val isAmountValid = amount.toIntOrNull() != null && amount.toInt() > 0
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Sell ${stock.name}") },
+        text = {
+            Column {
+                Text("Enter the amount of shares:")
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { Text("Amount") },
+                    isError = !isAmountValid && amount.isNotEmpty(),
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                )
+                if (!isAmountValid && amount.isNotEmpty()) {
+                    Text(
+                        text = "Please enter a valid positive number.",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (isAmountValid) {
+                        viewModel.manageStock(
+                            ticker = stock.ticker,
+                            userId = userId,
+                            amount = amount.toInt(),
+                            action = "sell",
+                            price = null
+                        )
+                        onDismiss()
+                    }
+                },
+                enabled = isAmountValid
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun PriceDialogue(
+    stock: Stock,
+    userId: String,
+    viewModel: FinancialInfoViewModel,
+    onDismiss: () -> Unit
+) {
+    var price by remember { mutableStateOf("") }
+    val isPriceValid = price.toIntOrNull() != null && price.toInt() > 0
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Sell ${stock.name}") },
+        text = {
+            Column {
+                Text("Enter the amount of shares:")
+                OutlinedTextField(
+                    value = price,
+                    onValueChange = { price = it },
+                    label = { Text("Price") },
+                    isError = !isPriceValid && price.isNotEmpty(),
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                )
+                if (!isPriceValid && price.isNotEmpty()) {
+                    Text(
+                        text = "Please enter a valid positive number.",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (isPriceValid) {
+                        viewModel.manageStock(
+                            ticker = stock.ticker,
+                            userId = userId,
+                            price = price.toInt(),
+                            action = "Alert",
+                            amount = null
+                        )
+                        onDismiss()
+                    }
+                },
+                enabled = isPriceValid
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+
+
+
 
