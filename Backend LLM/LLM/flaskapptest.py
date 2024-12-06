@@ -322,7 +322,7 @@ def main_stock_data():
     stock_data = {}
     for stock in stocks:
         # not wokring Franks end for some reason
-        print(f"Fetching 15-minute interval data for {stock['ticker']}...")
+        # print(f"Fetching 15-minute interval data for {stock['ticker']}...")
         data = fetch_intraday_data_yahoo(stock["ticker"], interval="15m", period="5d")
         if data:
             stock_data[stock["name"]] = data
@@ -508,8 +508,10 @@ def burorsell():
         # query_input = request.data
         ticker = datainput.get('ticker')
         amount = datainput.get('amount')
-        userid = datainput.get('userid')
-        burorsell = datainput.get('buy')
+        userid = datainput.get('userId')
+        action = datainput.get('action')
+        print(ticker,amount,userid,action)
+
         try:
             docs = (
                     db.collection("shares")
@@ -519,21 +521,30 @@ def burorsell():
 
             docs = list(docs)
 
+
             shares_owned = 0
             document_id = 0
             if docs:
                 for doc in docs:
                     shares_owned = doc.get('shares_owned')
                     document_id = doc.id
-            if document_id != 0:
-                db.collection("shares").document(document_id).create({"user_id":userid , "ticker": ticker, "shares_owned": amount})
+            # else:
+            #     print("No docs")
+            #     return jsonify({
+            #         "status": "Fail",
+            #         "message": "No docs "
+            #     }), 200
+            if document_id == 0 and action == "buy":
+                print("no docs")
+                # db.collection("shares").document(document_id).create({"user_id":userid , "ticker": ticker, "shares_owned": amount})
+                db.collection("shares").document().create({"user_id":userid , "ticker": ticker, "shares_owned": amount})
                 return jsonify({
                     "status": "Success",
                     "message": "You purchased "+str(amount)+" "+ticker+" stocks"
                 }), 200
             else:
                 
-                if burorsell == 'buy':
+                if action == 'buy':
                     shares_owned += amount
                     db.collection("shares").document(document_id).set({ "shares_owned": shares_owned,}, merge=True)
 
@@ -561,13 +572,14 @@ def burorsell():
                                 "status": "Success",
                                 "message": "You sold all your "+ticker+" stocks."
                             }), 200
-
-
-
-
-
         except Exception as e:
             logging.error(f"Error during task execution: {e}")
+        return jsonify({
+            "status": "Error",
+            "message": "Invalid request or unhandled condition."
+        }), 400
+
+
 
 
 
@@ -733,5 +745,5 @@ def home():
 
 if __name__ == '__main__':
     # no reason to run it always, we'll make it a app route call but we might not even use it
-    main_stock_data()
+    # main_stock_data()
     app.run(debug=True)
