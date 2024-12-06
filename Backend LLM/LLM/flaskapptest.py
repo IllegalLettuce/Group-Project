@@ -4,6 +4,13 @@ import json
 import time
 
 from google.cloud.firestore_v1 import FieldFilter
+
+import os
+
+import json
+import time
+
+from google.cloud.firestore_v1 import FieldFilter
 # from sagemaker.workflow.airflow import processing_config
 # from sympy import false
 
@@ -145,8 +152,8 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 ##r is necessary to tell python that its a file path
 #############################################################################################################################################
-# cred = credentials.Certificate(r"C:\Users\rthar\OneDrive\Desktop\firebase llm copy\firebasekey.json")#rory firebase key
-cred = credentials.Certificate(r"C:\Users\spenc\Desktop\MTU stuff\Software Dev Year 3\Semester 1\Group Project\firebasekey\year3groupproject-ee682-firebase-adminsdk-zdtvf-2484fe8f8a.json")#ferenc firebase key
+cred = credentials.Certificate(r"C:\Users\rthar\OneDrive\Desktop\firebase llm copy\firebasekey.json")#rory firebase key
+#cred = credentials.Certificate(r"C:\Users\spenc\Desktop\MTU stuff\Software Dev Year 3\Semester 1\Group Project\firebasekey\year3groupproject-ee682-firebase-adminsdk-zdtvf-2484fe8f8a.json")#ferenc firebase key
 #################################################################################################################################################
 firebase_admin.initialize_app(cred)
 
@@ -159,8 +166,12 @@ data = {
 
 ##the collection you want data in
 collection = db.collection('shares').document()
+
+
+#########################################################################
 ##addint data to the collection
 # collection.set(data)
+#########################################################################
 
 print("Document ID: ",collection.id)
 
