@@ -3,13 +3,16 @@ import os
 import json
 import time
 
-# from google.cloud.firestore_v1 import FieldFilter
+from google.cloud.firestore_v1 import FieldFilter
+
+import os
+
+import json
+import time
+
+from google.cloud.firestore_v1 import FieldFilter
 # from sagemaker.workflow.airflow import processing_config
 # from sympy import false
-
-import datetime
-
-from sympy.physics.units import temperature
 
 import config
 from flask import Flask, request, render_template, jsonify
@@ -19,9 +22,11 @@ import re
 from crewai import Agent, Task, Crew, LLM
 from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
-from crewai_tools import (
-    WebsiteSearchTool
-)
+import yfinance as yf
+from crewai_tools import WebsiteSearchTool
+
+import datetime
+date = datetime.datetime.now()
 
 
 # Import required modules from langchain_community, crewai, etc.
@@ -34,8 +39,9 @@ os.environ["GROQ_API_KEY"] = config.groqapiekey
 os.environ["GOOGLE_API_KEY"] = config.googleapikey
 os.environ["GEMINI_API_KEY"] = config.googleapikey
 os.environ["OTEL_SDK_DISABLED"] = "true" ## to get rid of that telemetry error at after executing agent tasks
+os.environ["OPENAI_API_KEY"] = config.chatopenaiapikey # need this cause otherwise the app has a meltdown even though we arent using this anyway
 
-# web_rag_tool = WebsiteSearchTool()
+web_rag_tool = WebsiteSearchTool
 
 
 
@@ -45,7 +51,24 @@ app = Flask(__name__)
 CORS(app)
 logging.basicConfig(level=logging.DEBUG)
 
+##################################################################
+#yfinance stocks 
 
+stocks = [
+    {"name": "Lockheed Martin", "ticker": "LMT"},
+    {"name": "General Dynamics", "ticker": "GD"},
+    {"name": "Northrop Grumman", "ticker": "NOC"},
+    {"name": "RTX", "ticker": "RTX"},
+    {"name": "Boeing", "ticker": "BA"},
+    {"name": "L3Harris", "ticker": "LHX"},
+    {"name": "Rheinmetall", "ticker": "RHM.DE"},
+    {"name": "SAAB", "ticker": "SAAB-B.ST"},
+    {"name": "Hensoldt", "ticker": "HAG.DE"},
+    {"name": "Leonardo", "ticker": "LDO.MI"},
+    # {"name": "Dodge"},
+    # {"nome": "Bitcoin"},
+    # {"name":"XHR"}
+]
 
 
 
@@ -60,11 +83,35 @@ ollama3 = LLM(model="ollama/llama3.2", base_url="http://localhost:11434")
 Gllm = ChatGroq(model_name="groq/llama3-70b-8192", temperature=0.3, max_tokens=4096)
 gemini = ChatGoogleGenerativeAI(model="gemini/gemini-1.5-flash",temperature=0.5)
 gem = LLM(model="gemini/gemini-1.5-flash",temperature=0.5)
+
+tool = WebsiteSearchTool(
+    website="https://duckduckgo.com",
+    config=dict(
+        llm=dict(
+            provider="google", # or google, openai, anthropic, llama2, ...
+            config=dict(
+                model="gemini/gemini-1.5-flash",
+                temperature=0.5,
+                # top_p=1,
+                # stream=true,
+            ),
+        ),
+        embedder=dict(
+            provider="google", # or openai, ollama, ...
+            config=dict(
+                model="models/embedding-001",
+                task_type="retrieval_document",
+                # title="Embeddings",
+            ),
+        ),
+    )
+)
+
 researcher_agent = Agent(
     role="Company Researcher",
     goal="To research the given company or crypto coin and provide financial insights.",
     backstory="In-depth knowledge of stocks and company financials.",
-    # tools = [web_rag_tool],
+    # tools = [tool],
     llm = gem
 )
 
@@ -104,8 +151,10 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 ##r is necessary to tell python that its a file path
-cred = credentials.Certificate(r"C:\Users\spenc\Desktop\MTU stuff\Software Dev Year 3\Semester 1\Group Project\firebasekey\year3groupproject-ee682-firebase-adminsdk-zdtvf-2484fe8f8a.json")
-
+#############################################################################################################################################
+cred = credentials.Certificate(r"C:\Users\rthar\OneDrive\Desktop\firebase llm copy\firebasekey.json")#rory firebase key
+#cred = credentials.Certificate(r"C:\Users\spenc\Desktop\MTU stuff\Software Dev Year 3\Semester 1\Group Project\firebasekey\year3groupproject-ee682-firebase-adminsdk-zdtvf-2484fe8f8a.json")#ferenc firebase key
+#################################################################################################################################################
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
@@ -117,8 +166,12 @@ data = {
 
 ##the collection you want data in
 collection = db.collection('shares').document()
+
+
+#########################################################################
 ##addint data to the collection
-collection.set(data)
+# collection.set(data)
+#########################################################################
 
 print("Document ID: ",collection.id)
 
@@ -133,87 +186,163 @@ print("Document ID: ",collection.id)
 def autopurchase():
 
     if request.method == 'POST':
-        print("Hi")
-        # while(True):
-        #
-        #     time.sleep((60*60*2)) for a constant loop put this around the code below
-        # try:
-        #
-        #
-        #     ##gotta figure out how to run this for ones that dont have any stock purchased and others which do,
-        #     #in the stock, we gotta save USER ID and Ticker, to identify the stuff
-        #     data = request.get_json()
-        #     company = data.get('company')
-        #     ticker = data.get('ticker')
-        #     buy = data.get('buy_percent')
-        #     sell = data.get('sell_percent')
-        #     funds = data.get('funds_dollar')
-        #
-        #
-        #     autopurchase_task = Task(
-        #         description="From the data given make a prediction as to whether the given stock buy, sell and hold percentages are going to increase is decrease"
-        #                     " the data is here "+ datafromapi,
-        #         agent=autopurchase_agent,
-        #         expected_output="I expect the output to be given like this and nothing more."
-        #                         "{"
-        #                         '"buy"": "x%",'
-        #                         '"sell": "z%"'
-        #                         "}"
-        #     )
-        #     crew = Crew(agents=[autopurchase_agent],
-        #                 tasks=[autopurchase_task], verbose=True)
-        #     result = crew.kickoff()
-        #
-        #     result = str(result)
-        #     jsonobject = json.loads(result)
-        #
-        #
-        #
-        #     agent_buy = jsonobject.get('buy')
-        #     agent_sell = jsonobject.get('sell')
-        #     price_per_share = pricefromapi
-        #
-        #
-        #     docs = (
-        #         db.collection("shares")
-        #         .where(filter=FieldFilter("user_id", "==", userid) and FieldFilter("ticker", "==", ticker) )
-        #         .stream()
-        #     )
-        #
-        #     docs = list(docs)
-        #
-        #     sharesowned = 0
-        #     document_id = 0
-        #     if docs:
-        #         for doc in docs:
-        #             sharesowned = doc.get('sharebought')
-        #             document_id = doc.id
-        #     #if the buy from API is greater than the given from user, then go ahead and buy as many stocks as possible until you can buy anymore
-        #     #then save that into the firebase database
-        #
-        #     if agent_buy>=buy:
-        #         sharesowned  += funds / price_per_share
-        #
-        #         #save share bought , ticker, user id into database so it can be retrieved for future use
-        #     else:
-        #         if agent_sell >= sell:
-        #         #get the share from database and sell them all
-        #             newfunds = price_per_share * sharesowned
-        #             sharesowned = 0
-        #         #remove share from the database
-        #
-        #     if document_id != 0:
-        #         doc_ref = db.collection("shares").document(document_id)
-        #         doc_ref.set({"sharesOwned": 100}, merge=True)
-        #
-        #
-        #     return jsonify({
-        #         "status": "success",
-        #         "message": company
-        #     }), 200
-        # except Exception as e:
-        #     logging.error(f"Error during task execution: {e}")
-        #     output = "Sorry, an error occurred while processing your request."
+
+        while(True):
+
+            # time.sleep((60*60*2)) for a constant loop put this around the code below
+            try:
+
+
+                ##gotta figure out how to run this for ones that dont have any stock purchased and others which do,
+                #in the stock, we gotta save USER ID and Ticker, to identify the stuff
+                data = request.get_json()
+                company = data.get('company')
+                ticker = data.get('ticker')
+                buy = data.get('buy_percent')
+                sell = data.get('sell_percent')
+                funds = data.get('funds_dollar')
+                datafromapi = "WASASA"
+                pricefromapi = 11
+
+
+                autopurchase_task = Task(
+                    description="From the data given make a prediction as to whether the given stock buy, sell and hold percentages are going to increase is decrease"
+                                " the data is here "+ datafromapi,
+                    agent=autopurchase_agent,
+                    expected_output="I expect the output to be given like this and nothing more."
+                                    "{"
+                                    '"buy"": "x%",'
+                                    '"sell": "z%"'
+                                    "}"
+                )
+                crew = Crew(agents=[autopurchase_agent],
+                            tasks=[autopurchase_task], verbose=True)
+                result = crew.kickoff()
+
+                result = str(result)
+                jsonobject = json.loads(result)
+
+
+
+                agent_buy = jsonobject.get('buy')
+                agent_sell = jsonobject.get('sell')
+                price_per_share = pricefromapi
+
+
+                docs = (
+                    db.collection("shares")
+                    # .where(filter=FieldFilter("user_id", "==", userid) and FieldFilter("ticker", "==", ticker) )       UNCOMMENT THIS
+                    .stream()
+                )
+
+                docs = list(docs)
+
+                sharesowned = 0
+                document_id = 0
+                if docs:
+                    for doc in docs:
+                        sharesowned = doc.get('sharebought')
+                        document_id = doc.id
+                #if the buy from API is greater than the given from user, then go ahead and buy as many stocks as possible until you can buy anymore
+                #then save that into the firebase database
+
+                if agent_buy>=buy:
+                    sharesowned  += funds / price_per_share
+
+                    #save share bought , ticker, user id into database so it can be retrieved for future use
+                else:
+                    if agent_sell >= sell:
+                    #get the share from database and sell them all
+                        newfunds = price_per_share * sharesowned
+                        sharesowned = 0
+                    #remove share from the database
+
+                if document_id != 0:
+                    doc_ref = db.collection("shares").document(document_id)
+                    doc_ref.set({"sharesOwned": 100}, merge=True)
+
+
+                return jsonify({
+                    "status": "success",
+                    "message": company
+                }), 200
+            except Exception as e:
+                logging.error(f"Error during task execution: {e}")
+                output = "Sorry, an error occurred while processing your request."
+
+#############################################################################################
+def fetch_intraday_data_yahoo(ticker, interval="15m", period="5d"):
+    try:
+        stock = yf.Ticker(ticker)
+        hist = stock.history(interval=interval, period=period)
+        
+        if hist.empty:
+            print(f"No intraday data found for {ticker}.")
+            return None
+
+        data = hist[["Open", "High", "Low", "Close", "Volume"]].to_dict(orient="index")
+        
+        formatted_data = {
+            date.strftime("%Y-%m-%d %H:%M:%S"): {
+                "Open": float(values["Open"]),
+                "High": float(values["High"]),
+                "Low": float(values["Low"]),
+                "Close": float(values["Close"]),
+                "Volume": int(values["Volume"]),
+            }
+            for date, values in data.items()
+        }
+        
+        return formatted_data
+    
+    except Exception as e:
+        print(f"Error fetching intraday data for {ticker}: {e}")
+        return None
+    
+def get_stock_data(stock_symbol):
+    """Fetch the latest stock data using Yahoo Finance."""
+    try:
+        stock = yf.Ticker(stock_symbol)
+        latest_prices = stock.history(period='7d')['Close'].tolist()
+        return latest_prices
+    except Exception as e:
+        logging.error(f"Error fetching stock data for {stock_symbol}: {e}")
+        return None
+
+# Add a new route for stock data
+@app.route('/stock', methods=['GET', 'POST'])
+def stock_recommendation():
+    if request.method == 'POST':
+        data = request.get_json()
+        stock_symbol = data.get("companay_ticker")  # Note: there's a typo in the original (companay)
+
+        if stock_symbol:
+            latest_prices = get_stock_data(stock_symbol)
+
+            if latest_prices:
+                output = f"The latest closing prices for {stock_symbol} over the past 7 days are: {latest_prices}. Use this data for financial recommendations."
+            else:
+                output = "Failed to fetch the latest stock prices."
+        else:
+            output = "Stock symbol not found in accountant_task result."
+
+        return output
+
+# Add a function to fetch and save stock data
+def main_stock_data():
+    stock_data = {}
+    for stock in stocks:
+        # not wokring Franks end for some reason
+        # print(f"Fetching 15-minute interval data for {stock['ticker']}...")
+        data = fetch_intraday_data_yahoo(stock["ticker"], interval="15m", period="5d")
+        if data:
+            stock_data[stock["name"]] = data
+
+    output_filename = "stock_data.json"
+    with open(output_filename, "w") as json_file:
+        json.dump(stock_data, json_file, indent=2)
+    print(f"Data saved to {output_filename}")
+
 
 
 
@@ -228,7 +357,7 @@ def main():
     output = None
 
 
-    if request.method == 'POST' or request.method == 'GET':
+    if request.method == 'POST':
 
         # test at home
         # query_input = request.form.get('query-input')
@@ -253,7 +382,7 @@ def main():
 
                 researcher_task = Task(
                     description="Research financial data for " + str(
-                        query_input) + " using yahoo finance news as of todays date",
+                        query_input) + " using www.google.com as of today's date",
                     agent=researcher_agent,
                     expected_output="Latest financial insights for making predictions."
                 )
@@ -324,7 +453,7 @@ def main():
                 blogger_task = Task(
                     description=f"{recommender_task}",
                     agent=blogger_agent,
-                    # expected_output="A very short informative detailed blog about how well a company is doing, and recommended percentages for buy|sell|hold"
+
                     expected_output="A very short informative detailed blog about how well a company is doing (about 20 words), and recommended percentages for buy|sell|hold which would be in the format of Buy : x% , Hold: y% , Sell: z% (dont write anything extra, and output it in this Json format"
                                     "{"
                                     '"blog": "{Informative detailed blog goes here}",'
@@ -381,11 +510,95 @@ def maintes():
 
 
 
+@app.route('/managestock', methods=['POST','OPTIONS'])
+def burorsell():
+    if request.method == "POST":
+        # query_input = request.data
+        # actual implementation
+        datainput = json.loads(request.data.decode('utf-8'))
+        # query_input = request.data
+        ticker = datainput.get('ticker')
+        amount = datainput.get('amount')
+        userid = datainput.get('userId')
+        action = datainput.get('action')
+        print(ticker,amount,userid,action)
+
+        try:
+            docs = (
+                    db.collection("shares")
+                    .where(filter=FieldFilter("user_id", "==", userid) and FieldFilter("ticker", "==", ticker) )
+                    .stream()
+                )
+
+            docs = list(docs)
+
+
+            shares_owned = 0
+            document_id = 0
+            if docs:
+                for doc in docs:
+                    shares_owned = doc.get('shares_owned')
+                    document_id = doc.id
+            # else:
+            #     print("No docs")
+            #     return jsonify({
+            #         "status": "Fail",
+            #         "message": "No docs "
+            #     }), 200
+            if document_id == 0 and action == "buy":
+                print("no docs")
+                # db.collection("shares").document(document_id).create({"user_id":userid , "ticker": ticker, "shares_owned": amount})
+                db.collection("shares").document().create({"user_id":userid , "ticker": ticker, "shares_owned": amount})
+                return jsonify({
+                    "status": "Success",
+                    "message": "You purchased "+str(amount)+" "+ticker+" stocks"
+                }), 200
+            else:
+                
+                if action == 'buy':
+                    shares_owned += amount
+                    db.collection("shares").document(document_id).set({ "shares_owned": shares_owned,}, merge=True)
+
+                    return jsonify({
+                        "status": "Success",
+                     "message": "You purchased "+str(amount)+" "+ticker+" stocks.\nNow you own "+str(shares_owned)+" stocks."
+                    }), 200
+                else:
+                    if amount > shares_owned:
+                        return jsonify({
+                            "status": "Error",
+                            "message": "You cannot sell more shares than what you have"
+                        }), 200
+                    else:
+                        shares_owned -= amount
+                        if shares_owned > 0 :
+                            db.collection("shares").document(document_id).set({ "shares_owned": shares_owned,}, merge=True)
+                            return jsonify({
+                                "status": "Success",
+                                "message": "You sold "+str(amount)+" "+ticker+" stocks.\nNow you own "+str(shares_owned)+" stocks."
+                            }), 200
+                        else:
+                            db.collection("shares").document(document_id).delete()
+                            return jsonify({
+                                "status": "Success",
+                                "message": "You sold all your "+ticker+" stocks."
+                            }), 200
+        except Exception as e:
+            logging.error(f"Error during task execution: {e}")
+        return jsonify({
+            "status": "Error",
+            "message": "Invalid request or unhandled condition."
+        }), 400
 
 
 
-import datetime
-date = datetime.datetime.now()
+
+
+
+
+
+
+
 
 # this is for testing stuff at home it you dont need to comment stuff out
 @app.route('/', methods=['GET', 'POST'])
@@ -419,9 +632,15 @@ def home():
 
             try:
 
+                # researcher_task = Task(
+                #     description="Research financial data for " + str(
+                #         query_input) + " using yahoo finance news as of " +str(date),
+                #     agent=researcher_agent,
+                #     expected_output="Latest financial insights for making predictions."
+                # )
                 researcher_task = Task(
                     description="Research financial data for " + str(
-                        query_input) + " using yahoo finance news as of " +str(date),
+                        query_input) + " using www.google.com as of "+str(date),
                     agent=researcher_agent,
                     expected_output="Latest financial insights for making predictions."
                 )
@@ -536,4 +755,6 @@ def home():
 
 
 if __name__ == '__main__':
+    # no reason to run it always, we'll make it a app route call but we might not even use it
+    # main_stock_data()
     app.run(debug=True)

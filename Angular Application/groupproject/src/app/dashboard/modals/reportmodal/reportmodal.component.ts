@@ -11,6 +11,7 @@ import {firstValueFrom, timeout} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment.development";
 import {CommonModule, NgOptimizedImage} from "@angular/common";
+import {getAuth} from "firebase/auth";
 
 @Component({
   selector: 'app-reportmodal',
@@ -34,8 +35,10 @@ export class ReportmodalComponent implements OnInit{
   isTheLLMLoading: boolean = false;
   ifAnErrorHasOccurred: boolean = false;
 
+
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { name: string }, private httpClient: HttpClient
+    @Inject(MAT_DIALOG_DATA) public data: { name: string },
+    private httpClient: HttpClient,
   ) {}
 
   /**
@@ -43,11 +46,17 @@ export class ReportmodalComponent implements OnInit{
    */
   async ngOnInit() {
     const name = this.data.name
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const userID = user?.uid;
+    console.log(userID);
+
     this.isTheLLMLoading = true;
+
     try {
       const uri_report = this.uri + '/report';
       this.responseFromLLM = await firstValueFrom(
-        this.httpClient.post(uri_report, {params: {name}})
+        this.httpClient.post(uri_report, {params: {name, userID}})
           .pipe(timeout(120000))
       );
     } catch (error) {

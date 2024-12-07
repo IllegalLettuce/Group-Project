@@ -16,7 +16,7 @@
 
       <label for="password">Confirm Password</label>
       <input type="password" id="confirmPassword" name="confirmPassword" placeholder="********************" formControlName="confirmPassword" required>
-      <button type="button" class="btn btn-paypal" (click)="goToPayPal()">Pay with PayPal</button>
+      <button type="button" class="btn btn-signin" [disabled]="registerForm.invalid" (click)="goToPayPal()">Pay and Register</button>
     </form>
   </div>
 </div>
