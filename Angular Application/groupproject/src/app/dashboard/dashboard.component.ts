@@ -22,13 +22,13 @@ import {HttpClient} from "@angular/common/http";
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
+
 export class DashboardComponent implements OnInit {
-  public data:any;
+  public data: any;
   stocks: { name: string, ticker: string }[] = [];
+  isTheLLMLoading: boolean = false;
+
   constructor(private dialog: MatDialog, private http: HttpClient) {}
-
-
-
 
   ngOnInit(): void {
     const uri_getstocks = environment.API_BASE_URL + '/getstocks';
@@ -36,36 +36,32 @@ export class DashboardComponent implements OnInit {
     this.http.post<any[]>(uri_getstocks, requestBody).subscribe(
       (response) => {
         this.stocks = response;
-      },
-      (error) => {
-        console.error("Error fetching stocks:", error);
       }
     );
   }
-
-
 
   /**
    * Controls the report dialog from the frontend
    * @param name
    */
-  openReportDialog(name: string){
-    this.dialog.open(ReportmodalComponent, {
+  openReportDialog(name: string) {
+    const dialogRef = this.dialog.open(ReportmodalComponent, {
       width: '28em',
       data: { name: name }
-    })
-  };
+    });
+    dialogRef.afterClosed().subscribe(() => {
+    });
+  }
 
   /**
    * Controls the manage stocks dialog from the frontend
    * @param name
    * @param ticker
    */
-  openManageDialog(name: string, ticker: string){
+  openManageDialog(name: string, ticker: string) {
     this.dialog.open(ManagemodalComponent, {
       width: '28em',
       data: { name: name, ticker: ticker }
-    })
+    });
   }
-/////////////////////////end of file
 }

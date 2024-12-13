@@ -68,6 +68,12 @@ export class RegistrationComponent implements OnInit {
     });
   }
 
+  /**
+   * Validators for the password form
+   * @param controlName
+   * @param matchingControlName
+   * @constructor
+   */
   ConfirmedValidator(controlName: string, matchingControlName: string) {
     return (formGroup: FormGroup) => {
       const control = formGroup.controls[controlName];
@@ -86,6 +92,9 @@ export class RegistrationComponent implements OnInit {
     };
   }
 
+  /**
+   * Goes to Paypal from the form
+   */
   goToPayPal() {
     const paymentAmount = "1000.00";
     sessionStorage.setItem('formData', JSON.stringify(this.registerForm.value));
@@ -94,6 +103,9 @@ export class RegistrationComponent implements OnInit {
     });
   }
 
+  /**
+   * Register user when back from paypal
+   */
   registerUser() {
     const formData = this.registerForm.value;
     const uri_create_user = environment.API_BASE_URL + '/createuser'
