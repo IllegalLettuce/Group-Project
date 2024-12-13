@@ -42,3 +42,9 @@ fun submitReview(rating: String, review: String, onComplete: (Boolean, String?) 
             onComplete(false, e.message)
         }
 }
+
+
+fun getCurrentUserId(): String? {
+    val user = FirebaseAuth.getInstance().currentUser
+    return user?.uid
+}

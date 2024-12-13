@@ -10,19 +10,29 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Query
 import retrofit2.http.Body
 import java.util.concurrent.TimeUnit
+
+@Serializable
+data class ManageStockRequest(
+    val ticker: String,
+    val userId: String,
+    val amount: Int,
+    val action: String, // "buy" or "sell"
+    val price: Int
+)
+
+@Serializable
+data class ManageStockResponse(
+    val success: Boolean,
+    val message: String
+)
 
 
 @Serializable
 data class Stock(
     val blog: String,
-    //val buy_percent: Int,
-    //val sell_percent: Int,
-    //val funds_dollar: Int
 )
 
 
@@ -31,9 +41,9 @@ object RetrofitInstance {
     private val json = Json { ignoreUnknownKeys = true }
 
     private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(1, TimeUnit.MINUTES)  // Connection timeout
-        .readTimeout(1, TimeUnit.MINUTES)     // Read timeout
-        .writeTimeout(1, TimeUnit.MINUTES)    // Write timeout
+        .connectTimeout(1, TimeUnit.MINUTES)
+        .readTimeout(1, TimeUnit.MINUTES)
+        .writeTimeout(1, TimeUnit.MINUTES)
         .build()
 
 
@@ -53,6 +63,11 @@ interface StockApiService {
     suspend fun getStockInfo(
         @Body blog: String
     ): Stock
+
+    @POST("https://quiet-yak-presently.ngrok-free.app/managestock")
+    suspend fun manageStock(
+        @Body request: Unit?
+    ): ManageStockResponse
 }
 
 
@@ -80,6 +95,9 @@ class FinancialInfoViewModel : ViewModel() {
     private val _financialInfo = MutableStateFlow<Stock?>(null)
     val financialInfo: StateFlow<Stock?> get() = _financialInfo
 
+    private val _actionStatus = MutableStateFlow<String?>(null)
+    val actionStatus: StateFlow<String?> get() = _actionStatus
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
@@ -97,17 +115,42 @@ class FinancialInfoViewModel : ViewModel() {
             }
         }
     }
-    fun purchaseStock(stock: Stock) {
+
+    fun manageStock(ticker: String, userId: String, amount: Int?, action: String, price: Int?) {
         viewModelScope.launch {
             try {
-                println("Purchased stock: ${stock.blog}")
-//                println("Purchased stock: ${stock.buy_percent}")
-//                println("Purchased stock: ${stock.sell_percent}")
-//                println("Purchased stock: ${stock.funds_dollar}")
+                val request = amount?.let {
+                    if (price != null) {
+                        ManageStockRequest(
+                            ticker = ticker,
+                            userId = userId,
+                            amount = it,
+                            action = action,
+                            price = price
+                        )
+                    }
+                }
+                val response = RetrofitInstance.api.manageStock(request)
+                if (response.success) {
+                    println("Stock action successful: ${response.message}")
+                } else {
+                    println("Stock action failed: ${response.message}")
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
+
+    fun purchaseStock(stock: Stock) {
+        viewModelScope.launch {
+            try {
+                println("Purchased stock: ${stock.blog}")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
 }
 

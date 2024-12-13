@@ -37,9 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myapplication.R
+import com.example.myapplication.database.getCurrentUserId
 import com.example.myapplication.database.loginUser
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.setUserLoggedIn
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,6 +113,8 @@ fun LoginScreen(navController: NavHostController) {
                         onClick = {
                             loginUser(email, password) { success, error ->
                                 if (success) {
+                                    val firebaseUser = FirebaseAuth.getInstance().currentUser
+                                    val userId = firebaseUser?.uid ?: ""
                                     setUserLoggedIn(context = navController.context, isLoggedIn = true)
                                     navController.navigate(Screen.Home.route)
                                 } else {
