@@ -1,5 +1,7 @@
 package com.example.myapplication.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -20,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +44,12 @@ import com.example.myapplication.database.getCurrentUserId
 import com.example.myapplication.database.loginUser
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.setUserLoggedIn
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +57,20 @@ fun LoginScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
+
+    val auth = FirebaseAuth.getInstance()
+
+    val googleSignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        handleGoogleSignInResult(task, auth, navController, { errorMessage = it })
+    }
+
+    val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken("174849208599-utvq3uiaar7m8gv6gk4rhqof9or1ag4k.apps.googleusercontent.com")
+        .build()
+
+    val googleSignInClient = GoogleSignIn.getClient(navController.context, googleSignInOptions)
+
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -107,8 +129,6 @@ fun LoginScreen(navController: NavHostController) {
                             .fillMaxWidth()
                             .padding(bottom = 24.dp)
                     )
-
-                    // Enhanced Login Button
                     TextButton(
                         onClick = {
                             loginUser(email, password) { success, error ->
@@ -131,6 +151,27 @@ fun LoginScreen(navController: NavHostController) {
                     ) {
                         Text("Login", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    TextButton(
+                        onClick = {
+                            googleSignInLauncher.launch(googleSignInClient.signInIntent)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(4.dp)
+                    ) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Sign in with Google", color = Color.Black, fontWeight = FontWeight.Medium)
+                    }
+
+
+
+
+
+
+
+
 
                     if (errorMessage.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(16.dp))
@@ -152,5 +193,25 @@ fun LoginScreen(navController: NavHostController) {
                 }
             }
         }
+    }
+}
+private fun handleGoogleSignInResult(
+    task: Task<GoogleSignInAccount>,
+    auth: FirebaseAuth,
+    navController: NavHostController,
+    onError: (String) -> Unit
+) {
+    try {
+        val account = task.getResult(Exception::class.java)
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        auth.signInWithCredential(credential).addOnCompleteListener { authTask ->
+            if (authTask.isSuccessful) {
+                navController.navigate(Screen.Home.route)
+            } else {
+                onError(authTask.exception?.localizedMessage ?: "Google sign-in failed")
+            }
+        }
+    } catch (e: Exception) {
+        onError(e.localizedMessage ?: "Google sign-in failed")
     }
 }

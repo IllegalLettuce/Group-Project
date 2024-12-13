@@ -19,8 +19,7 @@ data class ManageStockRequest(
     val ticker: String,
     val userId: String,
     val amount: Int,
-    val action: String, // "buy" or "sell"
-    val price: Int
+    val action: String,
 )
 
 @Serializable
@@ -66,7 +65,7 @@ interface StockApiService {
 
     @POST("https://quiet-yak-presently.ngrok-free.app/managestock")
     suspend fun manageStock(
-        @Body request: Unit?
+        @Body request: ManageStockRequest?
     ): ManageStockResponse
 }
 
@@ -116,20 +115,17 @@ class FinancialInfoViewModel : ViewModel() {
         }
     }
 
-    fun manageStock(ticker: String, userId: String, amount: Int?, action: String, price: Int?) {
+    fun manageStock(ticker: String, userId: String, amount: Int?, action: String,) {
         viewModelScope.launch {
             try {
                 val request = amount?.let {
-                    if (price != null) {
-                        ManageStockRequest(
+                    ManageStockRequest(
                             ticker = ticker,
                             userId = userId,
                             amount = it,
                             action = action,
-                            price = price
                         )
                     }
-                }
                 val response = RetrofitInstance.api.manageStock(request)
                 if (response.success) {
                     println("Stock action successful: ${response.message}")
@@ -141,16 +137,5 @@ class FinancialInfoViewModel : ViewModel() {
             }
         }
     }
-
-    fun purchaseStock(stock: Stock) {
-        viewModelScope.launch {
-            try {
-                println("Purchased stock: ${stock.blog}")
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
 }
 
