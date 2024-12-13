@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NavbarComponent} from "../navbar/navbar.component";
 import {FormsModule} from "@angular/forms";
 import {NgForOf} from "@angular/common";
@@ -6,6 +6,8 @@ import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {ReportmodalComponent} from "./modals/reportmodal/reportmodal.component";
 import {CommonModule} from "@angular/common";
 import {ManagemodalComponent} from "./modals/managemodal/managemodal.component";
+import { environment } from '../../environments/environment.development';
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-dashboard',
@@ -20,25 +22,28 @@ import {ManagemodalComponent} from "./modals/managemodal/managemodal.component";
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent {
-
+export class DashboardComponent implements OnInit {
   public data:any;
+  stocks: { name: string, ticker: string }[] = [];
+  constructor(private dialog: MatDialog, private http: HttpClient) {}
 
-  //Temporary stocks data
-  stocks = [
-    {name: "Lockheed Martin", ticker: "NYSE:LMT"},
-    {name: "General Dynamics", ticker: "NYSE: GD"},
-    {name: "Northrop Grumman", ticker: "NYSE: NOC"},
-    {name: "Rtx", ticker: "NYSE: RTX"},
-    {name: "Boeing", ticker: "NYSE: BA"},
-    {name: "L3Harris", ticker: "NYSE: LHX"},
-    {name: "Rheinmetall", ticker: "ETR: RHM"},
-    {name: "SAAB", ticker: "STO: SAAB-B"},
-    {name: "Hensoldt", ticker: "ETR: HAG"},
-    {name: "Leonardo", ticker: "BIT: LDO"}
-  ];
 
-  constructor(private dialog: MatDialog) {}
+
+
+  ngOnInit(): void {
+    const uri_getstocks = environment.API_BASE_URL + '/getstocks';
+    const requestBody = {};
+    this.http.post<any[]>(uri_getstocks, requestBody).subscribe(
+      (response) => {
+        this.stocks = response;
+      },
+      (error) => {
+        console.error("Error fetching stocks:", error);
+      }
+    );
+  }
+
+
 
   /**
    * Controls the report dialog from the frontend
