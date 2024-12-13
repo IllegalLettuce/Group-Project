@@ -1,6 +1,7 @@
 package com.example.myapplication.screens
 
 import FinancialInfoViewModel
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -281,10 +282,10 @@ fun PurchaseDialog(
                             ticker = stock.ticker,
                             userId = userId,
                             amount = amount.toInt(),
-                            action = "buy",
-                            price = null
+                            action = "buy"
                         )
                         onDismiss()
+
                     }
                 },
                 enabled = isAmountValid
@@ -341,7 +342,6 @@ fun SellDialogue(
                             userId = userId,
                             amount = amount.toInt(),
                             action = "sell",
-                            price = null
                         )
                         onDismiss()
                     }
@@ -398,7 +398,6 @@ fun PriceDialogue(
                         viewModel.manageStock(
                             ticker = stock.ticker,
                             userId = userId,
-                            price = price.toInt(),
                             action = "Alert",
                             amount = null
                         )
