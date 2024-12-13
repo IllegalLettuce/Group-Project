@@ -4,13 +4,8 @@ import json
 import time
 
 from google.cloud.firestore_v1 import FieldFilter
+from sympy.testing.runtests import method
 
-import os
-
-import json
-import time
-
-from google.cloud.firestore_v1 import FieldFilter
 # from sagemaker.workflow.airflow import processing_config
 # from sympy import false
 
@@ -27,9 +22,6 @@ from crewai_tools import WebsiteSearchTool
 
 import datetime
 date = datetime.datetime.now()
-
-
-# Import required modules from langchain_community, crewai, etc.
 
 
 # Configure environment variables for API keys and model names
@@ -53,7 +45,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 ##################################################################
 #yfinance stocks 
-
 stocks = [
     {"name": "Lockheed Martin", "ticker": "LMT"},
     {"name": "General Dynamics", "ticker": "GD"},
@@ -65,10 +56,11 @@ stocks = [
     {"name": "SAAB", "ticker": "SAAB-B.ST"},
     {"name": "Hensoldt", "ticker": "HAG.DE"},
     {"name": "Leonardo", "ticker": "LDO.MI"},
-    # {"name": "Dodge"},
-    # {"nome": "Bitcoin"},
-    # {"name":"XHR"}
+    {"name": "Dodge","ticker":""},
+    {"name": "Bitcoin","ticker":""},
+    {"name":"XHR","ticker":""}
 ]
+
 
 
 
@@ -76,6 +68,8 @@ stocks = [
 def format_output(text):
     """Convert Markdown bold syntax to HTML strong tags."""
     return re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
+
+
 
 
 # Set up agents and tasks
@@ -148,32 +142,21 @@ autopurchase_agent = Agent(
 
 
 import firebase_admin
-from firebase_admin import credentials
+from firebase_admin import credentials, auth
 from firebase_admin import firestore
 ##r is necessary to tell python that its a file path
 #############################################################################################################################################
-cred = credentials.Certificate(r"C:\Users\rthar\OneDrive\Desktop\firebase llm copy\firebasekey.json")#rory firebase key
-#cred = credentials.Certificate(r"C:\Users\spenc\Desktop\MTU stuff\Software Dev Year 3\Semester 1\Group Project\firebasekey\year3groupproject-ee682-firebase-adminsdk-zdtvf-2484fe8f8a.json")#ferenc firebase key
+# cred = credentials.Certificate(r"C:\Users\rthar\OneDrive\Desktop\firebase llm copy\firebasekey.json")#rory firebase key
+cred = credentials.Certificate(r"C:\Users\spenc\Desktop\MTU stuff\Software Dev Year 3\Semester 1\Group Project\firebasekey\year3groupproject-ee682-firebase-adminsdk-zdtvf-2484fe8f8a.json")#ferenc firebase key
 #################################################################################################################################################
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-data = {
-    'task' : 'Waayaya',
-    'status': 'Toodoo'
-}
-
-##the collection you want data in
-collection = db.collection('shares').document()
 
 
-#########################################################################
-##addint data to the collection
-# collection.set(data)
-#########################################################################
 
-print("Document ID: ",collection.id)
+
 
 
 @app.route('/manages', methods=['POST','OPTIONS','GET'])
@@ -183,12 +166,20 @@ print("Document ID: ",collection.id)
 
 
 
+
 def autopurchase():
 
     if request.method == 'POST':
 
         while(True):
 
+            # Load the stock data from the JSON file
+            with open('stock_data.json', 'r') as json_file:
+                stock_data = json.load(json_file)
+
+            company_in = "Lockheed Marting"
+
+            company_stock = stock_data[company_in]
             # time.sleep((60*60*2)) for a constant loop put this around the code below
             try:
 
@@ -201,13 +192,14 @@ def autopurchase():
                 buy = data.get('buy_percent')
                 sell = data.get('sell_percent')
                 funds = data.get('funds_dollar')
+
                 datafromapi = "WASASA"
                 pricefromapi = 11
 
 
                 autopurchase_task = Task(
                     description="From the data given make a prediction as to whether the given stock buy, sell and hold percentages are going to increase is decrease"
-                                " the data is here "+ datafromapi,
+                                " the data is here "+ company_stock,
                     agent=autopurchase_agent,
                     expected_output="I expect the output to be given like this and nothing more."
                                     "{"
@@ -502,21 +494,17 @@ def main():
 #this will be the autopurchase when its done
 @app.route('/manage', methods=['POST', 'OPTIONS'])
 def maintes():
+    pass
 
-    return jsonify({
-        "status": "request received",
-        "message": "Hi"
-    }), 200
 
 
 
 @app.route('/managestock', methods=['POST','OPTIONS'])
 def burorsell():
     if request.method == "POST":
-        # query_input = request.data
-        # actual implementation
+        print(request.data)
         datainput = json.loads(request.data.decode('utf-8'))
-        # query_input = request.data
+
         ticker = datainput.get('ticker')
         amount = datainput.get('amount')
         userid = datainput.get('userId')
@@ -589,12 +577,6 @@ def burorsell():
             "status": "Error",
             "message": "Invalid request or unhandled condition."
         }), 400
-
-
-
-
-
-
 
 
 
@@ -752,6 +734,49 @@ def home():
     # test at home
     return render_template('index.html', query_input=query_input, output=output)
 
+
+
+@app.route('/createuser',methods=['GET','POST'])
+def createuser():
+
+    if request.method == "POST":
+        datainput = json.loads(request.data.decode('utf-8'))
+        name = datainput.get('name')
+        surname = datainput.get('surname')
+        password = datainput.get('password')
+        email = datainput.get('email')
+        userType = datainput.get('userType')
+        createdAt = str(datetime.date.today())
+        try:
+            user_record = auth.create_user(
+                email=email,
+                password=password,
+                display_name=name
+            )
+            user_id = user_record.uid
+            user_ref = db.collection('users').document(user_id)
+            user_ref.set({
+                'name': name,
+                'surname':surname,
+                'email': email,
+                'userType': userType,
+                'createdAt': createdAt
+            })
+            # db.collection("users").document().create({"name":name ,"surname":surname, "email": email, "userType": userType,"createdAt":createdAt})
+            return jsonify({
+                "message":"created"
+            }), 200
+        except Exception as e:
+            logging.error(f"Error during task execution: {e}")
+
+    return jsonify({
+        "message":"Invalid Method"
+    }), 400
+
+@app.route('/getstocks',methods=['GET'])
+def getstocks():
+    if request.method == "GET":
+        return jsonify(stocks), 200
 
 
 if __name__ == '__main__':
