@@ -347,34 +347,14 @@ def main_stock_data():
 def main():
     query_input = None
     output = None
-
-
     if request.method == 'POST':
-
-        # test at home
-        # query_input = request.form.get('query-input')
-
-        # actual implementation
-        # query_input = json.loads(request.data.decode('utf-8'))
         query_input = request.data
-        # companyname = query_input.get('company')
-        # print(companyname)
-
-
-
-
         if query_input:
-
-            ##TESTING
-
-
-
-
             try:
 
                 researcher_task = Task(
                     description="Research financial data for " + str(
-                        query_input) + " using www.google.com as of today's date",
+                        query_input) + " using www.google.com as of "+str(date),
                     agent=researcher_agent,
                     expected_output="Latest financial insights for making predictions."
                 )
@@ -493,8 +473,30 @@ def main():
 
 #this will be the autopurchase when its done
 @app.route('/manage', methods=['POST', 'OPTIONS'])
-def maintes():
-    pass
+def autopurchaseregister():
+    if request.method == "POST":
+        datainput = json.loads(request.data.decode('utf-8'))
+        stockName = datainput.get('name')
+        ticker = datainput.get('Ticker')
+        funds = datainput.get('funds')
+        userid = datainput.get('userId')
+        buy = datainput.get('buy')
+        sell = datainput.get('sell')
+        shares_owned = 0
+
+        try:
+            db.collection("autopurchase").document().create({"user_id":userid , "name":stockName,"ticker":ticker, "shares_owned": shares_owned,"funds":funds,"buy":buy,"sell":sell})
+            return jsonify({
+                "status": "Success",
+                "message": "Autopurchase set up"
+            }), 200
+        except Exception as e:
+            logging.error(f"Error during task execution: {e}")
+    return jsonify({
+        "status": "Error",
+        "message": "Invalid request or unhandled condition."
+    }), 400
+
 
 
 
@@ -514,7 +516,7 @@ def burorsell():
         try:
             docs = (
                     db.collection("shares")
-                    .where(filter=FieldFilter("user_id", "==", userid) and FieldFilter("ticker", "==", ticker) )
+                    .where(filter=FieldFilter("user_id", "==", userid))
                     .stream()
                 )
 
@@ -525,17 +527,10 @@ def burorsell():
             document_id = 0
             if docs:
                 for doc in docs:
-                    shares_owned = doc.get('shares_owned')
-                    document_id = doc.id
-            # else:
-            #     print("No docs")
-            #     return jsonify({
-            #         "status": "Fail",
-            #         "message": "No docs "
-            #     }), 200
+                    if doc.get('ticker') == ticker:
+                        shares_owned = doc.get('shares_owned')
+                        document_id = doc.id
             if document_id == 0 and action == "buy":
-                print("no docs")
-                # db.collection("shares").document(document_id).create({"user_id":userid , "ticker": ticker, "shares_owned": amount})
                 db.collection("shares").document().create({"user_id":userid , "ticker": ticker, "shares_owned": amount})
                 return jsonify({
                     "status": "Success",
@@ -773,13 +768,13 @@ def createuser():
         "message":"Invalid Method"
     }), 400
 
-@app.route('/getstocks',methods=['GET'])
+@app.route('/getstocks',methods=['POST'])
 def getstocks():
-    if request.method == "GET":
+    if request.method == "POST":
         return jsonify(stocks), 200
 
 
 if __name__ == '__main__':
     # no reason to run it always, we'll make it a app route call but we might not even use it
-    # main_stock_data()
+
     app.run(debug=True)
