@@ -864,9 +864,8 @@ def autopurchase():
 
 
 if __name__ == '__main__':
-    # no reason to run it always, we'll make it a app route call but we might not even use it
-    # main_stock_data()
+    main_stock_data()
     thread = Thread(target = autopurchase,args = {})
     thread.start()
     thread.join()
-    # app.run(debug=True)
+    app.run(debug=True)
