@@ -30,11 +30,12 @@ export class RegistrationComponent implements OnInit {
       name: ['', Validators.required],
       surname: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.pattern(this.StrongPasswordRegx)]],
+      password: ['', [Validators.required]], //Validators.pattern(this.StrongPasswordRegx)
       confirmPassword: ['', Validators.required],
       userType: ['', Validators.required],
       companyName: [''],
-      adminEmail: ['']
+      adminEmail: [''],
+      funds: ['']
     }, {
       validators: this.ConfirmedValidator("password", "confirmPassword")
     });
@@ -119,12 +120,19 @@ export class RegistrationComponent implements OnInit {
    * Goes to Paypal from the form
    */
   goToPayPal() {
-    const paymentAmount = "1000.00";
+    let paymentAmount = 100.00;
+
+    if (this.registerForm.get('userType')?.value === 'admin') {
+      const funds = parseFloat(this.registerForm.get('funds')?.value || '0');
+      paymentAmount += funds;
+    }
+
     sessionStorage.setItem('formData', JSON.stringify(this.registerForm.value));
-    this.router.navigate(["/paypal"], {
-      queryParams: { amount: paymentAmount }
+    this.router.navigate(['/paypal'], {
+      queryParams: { amount: paymentAmount.toFixed(2) }
     });
   }
+
 
   /**
    * Register user when back from paypal

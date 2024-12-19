@@ -44,7 +44,6 @@
       </div>
 
       <div *ngIf="registerForm.get('userType')?.value === 'admin'">
-        <label for="companyName">Company Name</label>
         <input
           type="text"
           id="companyName"
@@ -52,10 +51,16 @@
           formControlName="companyName"
           required
         />
+        <input
+          type="text"
+          id="funds"
+          placeholder="Funds"
+          formControlName="funds"
+          required
+        />
       </div>
 
       <div *ngIf="registerForm.get('userType')?.value === 'manager'">
-        <label for="adminEmail">Admin Email</label>
         <input
           type="email"
           id="adminEmail"
