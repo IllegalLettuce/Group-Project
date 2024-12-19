@@ -71,3 +71,11 @@
   background-color: #4a90e2;
   color: white;
 }
+.register-left form input[type="text"],
+.register-left form input[type="email"],
+.register-left form input[type="password"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+

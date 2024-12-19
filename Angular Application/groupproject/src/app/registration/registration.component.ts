@@ -1,10 +1,10 @@
 import {ChangeDetectorRef, Component, NgZone, OnInit} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray} from '@angular/forms';
 import { environment } from '../../environments/environment.development';
 import {HttpClient} from "@angular/common/http";
 import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
-import {NgIf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 
 
 @Component({
@@ -12,7 +12,7 @@ import {NgIf} from "@angular/common";
   standalone: true,
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.css'],
-  imports: [ReactiveFormsModule, NgIf]
+  imports: [ReactiveFormsModule, NgIf, NgForOf]
 })
 export class RegistrationComponent implements OnInit {
   registerForm: FormGroup;
@@ -34,8 +34,9 @@ export class RegistrationComponent implements OnInit {
       confirmPassword: ['', Validators.required],
       userType: ['', Validators.required],
       companyName: [''],
-      adminEmail: [''],
-      funds: ['']
+      funds: [''],
+      adminEmails: this.builder.array([this.createEmailField()])
+
     }, {
       validators: this.ConfirmedValidator("password", "confirmPassword")
     });
@@ -46,14 +47,26 @@ export class RegistrationComponent implements OnInit {
     const state = navigation?.extras.state as { formData: any };
 
     if (state?.formData) {
-      console.log("Data found in router state");
       this.registerForm.setValue(state.formData);
       this.cdRef.detectChanges();
     } else {
       const savedFormData = sessionStorage.getItem('formData');
       if (savedFormData) {
         console.log("Data found in sessionStorage");
-        this.registerForm.setValue(JSON.parse(savedFormData));
+        const parsedData = JSON.parse(savedFormData);
+
+        //silly goofy email array validation
+        const adminEmailsArray = this.registerForm.get('adminEmails') as FormArray;
+        while (adminEmailsArray.length) {
+          adminEmailsArray.removeAt(0);
+        }
+        if (parsedData.adminEmails && Array.isArray(parsedData.adminEmails)) {
+          parsedData.adminEmails.forEach((email: string) => {
+            adminEmailsArray.push(this.builder.group({ email: [email, [Validators.required, Validators.email]] }));
+          });
+        }
+
+        this.registerForm.setValue(parsedData);
         this.cdRef.detectChanges();
       }
     }
@@ -62,7 +75,6 @@ export class RegistrationComponent implements OnInit {
       this.paymentSuccess = params["paymentSuccess"] === "true";
 
       if (this.paymentSuccess && this.registerForm.valid) {
-        console.log("Payment success, proceeding with user registration.");
         this.registerUser();
       } else if (!this.registerForm.valid) {
         console.error("Form is not valid");
@@ -70,6 +82,41 @@ export class RegistrationComponent implements OnInit {
         console.log("Payment not completed.");
       }
     });
+  }
+
+  /**
+   * Form
+   */
+  get adminEmails(): FormArray {
+    return this.registerForm.get('adminEmails') as FormArray;
+  }
+
+  /**
+   * Form
+   */
+  createEmailField(): FormGroup {
+    return this.builder.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+  }
+
+  /**
+   * Form
+   */
+  addEmail(): void {
+    if (this.adminEmails.length < 5) {
+      this.adminEmails.push(this.createEmailField());
+    }
+  }
+
+  /**
+   * Form
+   * @param index
+   */
+  removeEmail(index: number): void {
+    if (this.adminEmails.length > 1) {
+      this.adminEmails.removeAt(index);
+    }
   }
 
 
@@ -80,16 +127,16 @@ export class RegistrationComponent implements OnInit {
     const userType = this.registerForm.get('userType')?.value;
     if (userType === 'admin') {
       this.registerForm.get('companyName')?.setValidators(Validators.required);
-      this.registerForm.get('adminEmail')?.clearValidators();
+      this.registerForm.get('adminEmails')?.clearValidators();
     } else if (userType === 'manager') {
-      this.registerForm.get('adminEmail')?.setValidators([Validators.required, Validators.email]);
+      this.registerForm.get('adminEmails')?.setValidators([Validators.required]);
       this.registerForm.get('companyName')?.clearValidators();
     } else {
       this.registerForm.get('companyName')?.clearValidators();
-      this.registerForm.get('adminEmail')?.clearValidators();
+      this.registerForm.get('adminEmails')?.clearValidators();
     }
     this.registerForm.get('companyName')?.updateValueAndValidity();
-    this.registerForm.get('adminEmail')?.updateValueAndValidity();
+    this.registerForm.get('adminEmails')?.updateValueAndValidity();
   }
 
   /**
@@ -139,6 +186,7 @@ export class RegistrationComponent implements OnInit {
    */
   registerUser() {
     const formData = this.registerForm.value;
+    formData.adminEmails = formData.adminEmails.map((emailGroup: { email: any; }) => emailGroup.email);
     const uri_create_user = environment.API_BASE_URL + '/createuser'
     const auth = getAuth()
     const { email, password } = formData;

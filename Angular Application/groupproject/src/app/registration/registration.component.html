@@ -1,6 +1,7 @@
 <div class="register-container">
   <div class="register-left">
     <h1>Register</h1>
+      <p>A flat registration fee of 100 EURO is required</p>
     <form [formGroup]="registerForm" (ngSubmit)="registerUser()">
       <label for="name">First Name</label>
       <input type="text" id="name" placeholder="John" formControlName="name" required>
@@ -42,8 +43,10 @@
           Manager
         </label>
       </div>
+      <br>
 
       <div *ngIf="registerForm.get('userType')?.value === 'admin'">
+        <label for="companyName">Company Name</label>
         <input
           type="text"
           id="companyName"
@@ -51,6 +54,7 @@
           formControlName="companyName"
           required
         />
+        <label for="funds">Funds</label>
         <input
           type="text"
           id="funds"
@@ -61,14 +65,36 @@
       </div>
 
       <div *ngIf="registerForm.get('userType')?.value === 'manager'">
-        <input
-          type="email"
-          id="adminEmail"
-          placeholder="Enter admin email"
-          formControlName="adminEmail"
-          required
-        />
+        <label>Admin Emails (up to 5)</label>
+
+        <div formArrayName="adminEmails">
+          <div *ngFor="let emailControl of adminEmails.controls; let i = index">
+            <div [formGroupName]="i">
+              <input
+                type="email"
+                placeholder="Enter admin email"
+                formControlName="email"
+                required
+              />
+              <button
+                type="button"
+                *ngIf="i !== 0"
+                (click)="removeEmail(i)">
+                Remove Email
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="addEmail()"
+          [disabled]="adminEmails.length >= 5">
+          Add Email
+        </button>
       </div>
+
+
 
       <button
         type="button"

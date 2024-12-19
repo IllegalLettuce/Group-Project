@@ -67,13 +67,14 @@ export class ReportmodalComponent implements OnInit {
     this.progressInterval = setInterval(() => {
       if (this.progressBar < 80) {
         this.progressBar += Math.floor(Math.random() * (8 - 2 + 1)) + 2;
-      }else if (this.progressBar > 80){
+      }
+      else if (this.progressBar > 80){
         console.log("")
       }
       else {
         clearInterval(this.progressInterval);
       }
-    }, 2000);
+    }, (Math.floor(Math.random() * (4000 - 2000 + 1)) + 2000));
   }
 
   /**
