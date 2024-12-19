@@ -14,22 +14,67 @@
       <label for="password">Password</label>
       <input type="password" id="password" name="password" placeholder="********************" formControlName="password" required>
 
-      <label for="confirmPassword"> Confirm Password</label>
+      <label for="confirmPassword">Confirm Password</label>
       <input type="password" id="confirmPassword" name="confirmPassword" placeholder="********************" formControlName="confirmPassword" required>
 
       <label for="role">Role</label>
       <div id="role">
         <label>
-          <input type="radio" name="userType" value="admin" formControlName="userType" required />
+          <input
+            type="radio"
+            name="userType"
+            value="admin"
+            formControlName="userType"
+            (change)="adminOrManager()"
+            required
+          />
           Admin
         </label>
         <label>
-          <input type="radio" name="userType" value="manager" formControlName="userType" required />
+          <input
+            type="radio"
+            name="userType"
+            value="manager"
+            formControlName="userType"
+            (change)="adminOrManager()"
+            required
+          />
           Manager
         </label>
       </div>
-      <button type="button" class="btn btn-signin" [disabled]="registerForm.invalid" (click)="goToPayPal()">Pay and Register</button>
+
+      <div *ngIf="registerForm.get('userType')?.value === 'admin'">
+        <label for="companyName">Company Name</label>
+        <input
+          type="text"
+          id="companyName"
+          placeholder="Enter company name"
+          formControlName="companyName"
+          required
+        />
+      </div>
+
+      <div *ngIf="registerForm.get('userType')?.value === 'manager'">
+        <label for="adminEmail">Admin Email</label>
+        <input
+          type="email"
+          id="adminEmail"
+          placeholder="Enter admin email"
+          formControlName="adminEmail"
+          required
+        />
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-signin"
+        [disabled]="registerForm.invalid"
+        (click)="goToPayPal()"
+      >
+        Pay and Register
+      </button>
     </form>
   </div>
 </div>
+
 

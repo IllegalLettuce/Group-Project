@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { environment } from '../../environments/environment.development';
 import {HttpClient} from "@angular/common/http";
 import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
+import {NgIf} from "@angular/common";
 
 
 @Component({
@@ -11,7 +12,7 @@ import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
   standalone: true,
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.css'],
-  imports: [ReactiveFormsModule]
+  imports: [ReactiveFormsModule, NgIf]
 })
 export class RegistrationComponent implements OnInit {
   registerForm: FormGroup;
@@ -29,9 +30,11 @@ export class RegistrationComponent implements OnInit {
       name: ['', Validators.required],
       surname: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.pattern(this.StrongPasswordRegx)]],
       confirmPassword: ['', Validators.required],
-      userType: ['', Validators.required]
+      userType: ['', Validators.required],
+      companyName: [''],
+      adminEmail: ['']
     }, {
       validators: this.ConfirmedValidator("password", "confirmPassword")
     });
@@ -66,6 +69,26 @@ export class RegistrationComponent implements OnInit {
         console.log("Payment not completed.");
       }
     });
+  }
+
+
+  /**
+   * Different inputs for admin or manager in the form
+   */
+  adminOrManager(): void {
+    const userType = this.registerForm.get('userType')?.value;
+    if (userType === 'admin') {
+      this.registerForm.get('companyName')?.setValidators(Validators.required);
+      this.registerForm.get('adminEmail')?.clearValidators();
+    } else if (userType === 'manager') {
+      this.registerForm.get('adminEmail')?.setValidators([Validators.required, Validators.email]);
+      this.registerForm.get('companyName')?.clearValidators();
+    } else {
+      this.registerForm.get('companyName')?.clearValidators();
+      this.registerForm.get('adminEmail')?.clearValidators();
+    }
+    this.registerForm.get('companyName')?.updateValueAndValidity();
+    this.registerForm.get('adminEmail')?.updateValueAndValidity();
   }
 
   /**
