@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NavbarComponent} from "../navbar/navbar.component";
+import {getAuth} from "firebase/auth";
 
 @Component({
   selector: 'app-dashboardmanager',
@@ -10,6 +11,10 @@ import {NavbarComponent} from "../navbar/navbar.component";
   templateUrl: './dashboardmanager.component.html',
   styleUrl: './dashboardmanager.component.css'
 })
-export class DashboardmanagerComponent {
+export class DashboardmanagerComponent implements OnInit{
+
+  ngOnInit() {
+
+  }
 
 }

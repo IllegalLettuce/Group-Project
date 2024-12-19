@@ -2,8 +2,8 @@
 <div class="container">
   <div class="form-container" *ngFor="let stock of stocks; let i = index">
     <h3>Select Stock: {{ stock.name }}</h3>
-    <div>
-
+    <div *ngIf="stock.graphUrl">
+      <img [src]="stock.graphUrl" alt="Graph for {{ stock.name }}" class="stock-graph"/>
     </div>
     <div>
       <button type="button" (click)="openReportDialog(stock.name)">Generate Report</button>
@@ -11,5 +11,4 @@
     </div>
   </div>
 </div>
-
 

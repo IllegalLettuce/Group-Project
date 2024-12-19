@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {NavbarComponent} from "../navbar/navbar.component";
 import {FormsModule} from "@angular/forms";
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgOptimizedImage} from "@angular/common";
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {ReportmodalComponent} from "./modals/reportmodal/reportmodal.component";
 import {CommonModule} from "@angular/common";
@@ -17,7 +17,8 @@ import {HttpClient} from "@angular/common/http";
     FormsModule,
     NgForOf,
     MatDialogModule,
-    CommonModule
+    CommonModule,
+    NgOptimizedImage
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
@@ -25,19 +26,48 @@ import {HttpClient} from "@angular/common/http";
 
 export class DashboardComponent implements OnInit {
   public data: any;
-  stocks: { name: string, ticker: string }[] = [];
-  isTheLLMLoading: boolean = false;
+  stocks: {
+    graphUrl: any;
+    name: string, ticker: string }[] = [];
 
   constructor(private dialog: MatDialog, private http: HttpClient) {}
 
   ngOnInit(): void {
-    const uri_getstocks = environment.API_BASE_URL + '/getstocks';
+    const uriGetStocks = environment.API_BASE_URL + '/getstocks';
     const requestBody = {};
-    this.http.post<any[]>(uri_getstocks, requestBody).subscribe(
+    this.http.post<any[]>(uriGetStocks, requestBody).subscribe(
       (response) => {
         this.stocks = response;
+        this.generateStockGraphs();
       }
     );
+  }
+
+  /**
+   * Creates the stock graphs for the dashboard
+   */
+  generateStockGraphs() {
+    const uri_graphs = environment.API_BASE_URL + "/generate_graphs";
+    const requestBody = { stocks: this.stocks };
+    this.http.post<{ status: string, graphs: Record<string, string> }>(uri_graphs, requestBody)
+      .subscribe(response => {
+        if (response.status === 'success') {
+          this.updateStockGraphs(response.graphs);
+        }
+      });
+  }
+
+  /**
+   * Updates the stocks for the dashboard
+   * @param graphs
+   */
+  updateStockGraphs(graphs: Record<string, string>) {
+    this.stocks = this.stocks.map(stock => {
+      const graphUrl = graphs[stock.name]
+        ? `${environment.API_BASE_URL}/graphs/${graphs[stock.name]}`
+        : undefined;
+      return { ...stock, graphUrl };
+    });
   }
 
   /**
@@ -46,7 +76,7 @@ export class DashboardComponent implements OnInit {
    */
   openReportDialog(name: string) {
     const dialogRef = this.dialog.open(ReportmodalComponent, {
-      width: '28em',
+      width: '30em',
       data: { name: name }
     });
     dialogRef.afterClosed().subscribe(() => {
@@ -60,7 +90,7 @@ export class DashboardComponent implements OnInit {
    */
   openManageDialog(name: string, ticker: string) {
     this.dialog.open(ManagemodalComponent, {
-      width: '28em',
+      width: '30em',
       data: { name: name, ticker: ticker }
     });
   }
