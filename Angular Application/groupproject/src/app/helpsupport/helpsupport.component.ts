@@ -5,6 +5,7 @@ import {RouterOutlet} from "@angular/router";
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgIf} from "@angular/common";
 import {addDoc, collection, Firestore} from "@angular/fire/firestore";
+import {getAuth} from "firebase/auth";
 
 @Component({
   selector: 'app-helpsupport',
@@ -22,6 +23,7 @@ import {addDoc, collection, Firestore} from "@angular/fire/firestore";
 export class HelpsupportComponent {
   helpForm: FormGroup;
 
+
   constructor(private builder: FormBuilder, public firestore: Firestore) {
     this.helpForm = this.builder.group({
       title: ['', Validators.required],
@@ -30,7 +32,9 @@ export class HelpsupportComponent {
   }
 
   async createHelpMsg(title: string, message: string) {
+    const auth = getAuth();
     const docRef = await addDoc(collection(this.firestore, 'help_message'), {
+      userID: auth.currentUser?.uid,
       title: title,
       message: message
     });
