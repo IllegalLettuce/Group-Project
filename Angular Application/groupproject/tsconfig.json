@@ -15,8 +15,8 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "target": "ES2022",
-    "module": "ES2022",
+    "target": "ES5",
+    "module": "CommonJS",
     "useDefineForClassFields": false,
     "lib": [
       "ES2022",
@@ -30,3 +30,4 @@
     "strictTemplates": true
   }
 }
+

@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "karma": "^6.4.4",
+    "karma-chrome-launcher": "^3.2.0",
+    "karma-jasmine-html-reporter": "^2.1.0"
+  }
+}
