@@ -62,16 +62,10 @@ stocks = [
     {"name":"XHR","ticker":""}
 ]
 
-
-
-
 # Define a function to format text by converting Markdown bold syntax to HTML strong tags
 def format_output(text):
     """Convert Markdown bold syntax to HTML strong tags."""
     return re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
-
-
-
 
 # Set up agents and tasks
 ollama3 = LLM(model="ollama/llama3.2", base_url="http://localhost:11434")
@@ -80,7 +74,7 @@ gemini = ChatGoogleGenerativeAI(model="gemini/gemini-1.5-flash",temperature=0.5)
 gem = LLM(model="gemini/gemini-1.5-flash",temperature=0.5)
 
 tool = WebsiteSearchTool(
-    website="https://duckduckgo.com",
+    website="https://google.com",
     config=dict(
         llm=dict(
             provider="google", # or google, openai, anthropic, llama2, ...
@@ -106,7 +100,7 @@ researcher_agent = Agent(
     role="Company Researcher",
     goal="To research the given company or crypto coin and provide financial insights.",
     backstory="In-depth knowledge of stocks and company financials.",
-    # tools = [tool],
+    tools = [tool],
     llm = gem
 )
 
@@ -155,113 +149,6 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 
-
-
-
-
-
-@app.route('/manages', methods=['POST','OPTIONS','GET'])
-#receive a request with the ticker symbol
-#the funds which can be used to purchase
-#the separate percentages
-
-
-
-
-def autopurchase():
-
-    if request.method == 'POST':
-
-        while(True):
-
-            # Load the stock data from the JSON file
-            with open('stock_data.json', 'r') as json_file:
-                stock_data = json.load(json_file)
-
-            company_in = "Lockheed Marting"
-
-            company_stock = stock_data[company_in]
-            # time.sleep((60*60*2)) for a constant loop put this around the code below
-            try:
-
-
-                ##gotta figure out how to run this for ones that dont have any stock purchased and others which do,
-                #in the stock, we gotta save USER ID and Ticker, to identify the stuff
-                data = request.get_json()
-                company = data.get('company')
-                ticker = data.get('ticker')
-                buy = data.get('buy_percent')
-                sell = data.get('sell_percent')
-                funds = data.get('funds_dollar')
-
-                datafromapi = "WASASA"
-                pricefromapi = 11
-
-
-                autopurchase_task = Task(
-                    description="From the data given make a prediction as to whether the given stock buy, sell and hold percentages are going to increase is decrease"
-                                " the data is here "+ company_stock,
-                    agent=autopurchase_agent,
-                    expected_output="I expect the output to be given like this and nothing more."
-                                    "{"
-                                    '"buy"": "x%",'
-                                    '"sell": "z%"'
-                                    "}"
-                )
-                crew = Crew(agents=[autopurchase_agent],
-                            tasks=[autopurchase_task], verbose=True)
-                result = crew.kickoff()
-
-                result = str(result)
-                jsonobject = json.loads(result)
-
-
-
-                agent_buy = jsonobject.get('buy')
-                agent_sell = jsonobject.get('sell')
-                price_per_share = pricefromapi
-
-
-                docs = (
-                    db.collection("shares")
-                    # .where(filter=FieldFilter("user_id", "==", userid) and FieldFilter("ticker", "==", ticker) )       UNCOMMENT THIS
-                    .stream()
-                )
-
-                docs = list(docs)
-
-                sharesowned = 0
-                document_id = 0
-                if docs:
-                    for doc in docs:
-                        sharesowned = doc.get('sharebought')
-                        document_id = doc.id
-                #if the buy from API is greater than the given from user, then go ahead and buy as many stocks as possible until you can buy anymore
-                #then save that into the firebase database
-
-                if agent_buy>=buy:
-                    sharesowned  += funds / price_per_share
-
-                    #save share bought , ticker, user id into database so it can be retrieved for future use
-                else:
-                    if agent_sell >= sell:
-                    #get the share from database and sell them all
-                        newfunds = price_per_share * sharesowned
-                        sharesowned = 0
-                    #remove share from the database
-
-                if document_id != 0:
-                    doc_ref = db.collection("shares").document(document_id)
-                    doc_ref.set({"sharesOwned": 100}, merge=True)
-
-
-                return jsonify({
-                    "status": "success",
-                    "message": company
-                }), 200
-            except Exception as e:
-                logging.error(f"Error during task execution: {e}")
-                output = "Sorry, an error occurred while processing your request."
 
 #############################################################################################
 def fetch_intraday_data_yahoo(ticker, interval="15m", period="5d"):
@@ -325,7 +212,6 @@ def stock_recommendation():
 def main_stock_data():
     stock_data = {}
     for stock in stocks:
-        # not wokring Franks end for some reason
         # print(f"Fetching 15-minute interval data for {stock['ticker']}...")
         data = fetch_intraday_data_yahoo(stock["ticker"], interval="15m", period="5d")
         if data:
@@ -335,12 +221,6 @@ def main_stock_data():
     with open(output_filename, "w") as json_file:
         json.dump(stock_data, json_file, indent=2)
     print(f"Data saved to {output_filename}")
-
-
-
-
-
-
 
 # Define route for home page
 
@@ -470,39 +350,6 @@ def main():
     # return render_template('index.html', query_input=query_input, output=output)
 
 
-
-
-#this will be the autopurchase when its done
-@app.route('/manage', methods=['POST', 'OPTIONS'])
-def autopurchaseregister():
-    if request.method == "POST":
-        datainput = json.loads(request.data.decode('utf-8'))
-        stockName = datainput.get('name')
-        ticker = datainput.get('Ticker')
-        funds = int(datainput.get('funds'))
-        userid = datainput.get('userId')
-        buy = int(datainput.get('buy'))
-        sell = int(datainput.get('sell'))
-        shares_owned = 0
-
-        try:
-            db.collection("autopurchase").document().create({"userid":userid , "company":stockName,"ticker":ticker, "shares_owned": shares_owned,"buy_percent":buy,"sell_percent":sell})
-            db.collection("funds").document().create({"userid":userid, "funds":funds})
-            return jsonify({
-                "status": "Success",
-                "message": "Autopurchase set up"
-            }), 200
-        except Exception as e:
-            logging.error(f"Error during task execution: {e}")
-    return jsonify({
-        "status": "Error",
-        "message": "Invalid request or unhandled condition."
-    }), 400
-
-
-
-
-
 @app.route('/managestock', methods=['POST','OPTIONS'])
 def burorsell():
     if request.method == "POST":
@@ -576,9 +423,6 @@ def burorsell():
         }), 400
 
 
-
-
-
 # this is for testing stuff at home it you dont need to comment stuff out
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -619,7 +463,7 @@ def home():
                 # )
                 researcher_task = Task(
                     description="Research financial data for " + str(
-                        query_input) + " using www.google.com as of "+str(date),
+                        query_input) + "on https://google.com/"+str(query_input) +" as of "+str(date),
                     agent=researcher_agent,
                     expected_output="Latest financial insights for making predictions."
                 )
@@ -738,44 +582,119 @@ def createuser():
 
     if request.method == "POST":
         datainput = json.loads(request.data.decode('utf-8'))
-        name = datainput.get('name')
-        surname = datainput.get('surname')
-        password = datainput.get('password')
-        email = datainput.get('email')
         userType = datainput.get('userType')
-        createdAt = str(datetime.date.today())
-        try:
-            user_record = auth.create_user(
-                email=email,
-                password=password,
-                display_name=name
-            )
-            user_id = user_record.uid
-            user_ref = db.collection('users').document(user_id)
-            user_ref.set({
-                'name': name,
-                'surname':surname,
-                'email': email,
-                'userType': userType,
-                'createdAt': createdAt
-            })
-            # db.collection("users").document().create({"name":name ,"surname":surname, "email": email, "userType": userType,"createdAt":createdAt})
-            return jsonify({
-                "message":"created"
-            }), 200
-        except Exception as e:
-            logging.error(f"Error during task execution: {e}")
-
+        if userType == "admin":
+            try:
+                name = datainput.get('name')
+                password = datainput.get('password')
+                email = datainput.get('email')
+                capital = int(datainput.get('funds'))
+                companyName = datainput.get('companyName')
+                user_record = auth.create_user(
+                    email=email,
+                    password=password,
+                    display_name=name
+                )
+                user_id = user_record.uid
+                user_ref = db.collection('admins').document(user_id)
+                user_ref.set({
+                    'capital':capital,
+                    'companyName':companyName
+                })
+                return jsonify({
+                    "message":"created"
+                }), 200
+            except Exception as e:
+                logging.error(f"Error during task execution: {e}")
+        elif userType == "manager":
+            try:
+                name = datainput.get('name')
+                password = datainput.get('password')
+                email = datainput.get('email')
+                user_record = auth.create_user(
+                    email=email,
+                    password=password,
+                    display_name=name
+                )
+                user_id = user_record.uid
+                emails = datainput.get('adminEmails')
+                matching_user_ids = []
+                page = auth.list_users()
+                while page:
+                    for user in page.users:
+                        for email in emails:
+                            if user.email == email:
+                                matching_user_ids.append(user.uid)
+                    page = page.get_next_page()
+                user_ref = db.collection('managers').document(user_id)
+                user_ref.set({
+                    'adminID':matching_user_ids
+                })
+                return jsonify({
+                    "message":"created"
+                }), 200
+            except Exception as e:
+                logging.error(f"Error during task execution: {e}")
     return jsonify({
         "message":"Invalid Method"
     }), 400
+
+
+
+@app.route('/addadmin',methods=['POST'])
+
+def addadmin():
+    if request.method == 'POST':
+        datainput = json.loads(request.data.decode('utf-8'))
+        managerid = datainput.get('managerID')
+        email = datainput.get('email')
+        matching_user_ids = []
+        page = auth.list_users()
+        while page:
+            for user in page.users:
+                if user.email == email:
+                    matching_user_ids.append(user.uid)
+            page = page.get_next_page()
+        manager = db.collection("manager").document(managerid)
+        from google.cloud import firestore
+        manager.update({"adminID":firestore.ArrayUnion([matching_user_ids])})
+        return jsonify({
+            "message":"Updated manager with more admins"
+        }), 200
+
+
 
 @app.route('/getstocks',methods=['POST'])
 def getstocks():
     if request.method == "POST":
         return jsonify(stocks), 200
 
+#this will be the autopurchase when its done
+@app.route('/manage', methods=['POST', 'OPTIONS'])
+def autopurchaseregister():
+    if request.method == "POST":
+        datainput = json.loads(request.data.decode('utf-8'))
+        stockName = datainput.get('name')
+        ticker = datainput.get('Ticker')
+        funds = int(datainput.get('funds'))
+        userid = datainput.get('companyName')
+        buy = int(datainput.get('buy'))
+        sell = int(datainput.get('sell'))
+        shares_owned = 0
 
+        try:
+            db.collection("autopurchase").document().create({"userid":userid , "company":stockName,"ticker":ticker, "shares_owned": shares_owned,"buy_percent":buy,"sell_percent":sell})
+            db.collection("funds").document().create({"userid":userid, "funds":funds})
+            return jsonify({
+                "status": "Success",
+                "message": "Autopurchase set up"
+            }), 200
+        except Exception as e:
+            logging.error(f"Error during task execution: {e}")
+    return jsonify({
+        "status": "Error",
+        "message": "Invalid request or unhandled condition."
+    }), 400
 
 def autopurchase():
 
@@ -800,21 +719,21 @@ def autopurchase():
                 for doc in docs:
                     shares_owned = doc.get('shares_owned')
                     document_id = doc.id
-                    company = doc.get('name')
+                    company = doc.get('company')
                     buy = doc.get('buy_percent')
                     sell = doc.get('sell_percent')
                     funds = 0
-                    user_id = doc.get('userid')
+                    user_id = doc.get('companyName')
                     fundsid = 0
 
                     funddocs = (
-                        db.collection("funds").stream()
+                        db.collection("admin").stream()
                     )
 
                     funddocs = list(funddocs)
                     for funds in funddocs:
-                        if funds.get('userid') == user_id:
-                            funds.get('funds')
+                        if funds.get('companyName') == user_id:
+                            funds.get('capital')
                             fundsid = funds.id
 
 
@@ -824,7 +743,7 @@ def autopurchase():
                     autopurchase_task = Task(
                         description="From the data given here make a prediction as to whether it is a good idea to buy or sell the stock of this given company "+ str(company_stock),
                         agent=autopurchase_agent,
-                        expected_output="I expect the output to be given like this as whole numbers, do not put string, just numbers even if its 0 and nothing more."
+                        expected_output="I expect the output to be given like this as whole numbers, just numbers even if its 0 and nothing more."
                                         "{"
                                         '"Buy"": "x%",'
                                         '"Sell": "z%"'
@@ -864,8 +783,10 @@ def autopurchase():
 
 
 if __name__ == '__main__':
-    main_stock_data()
-    thread = Thread(target = autopurchase,args = {})
-    thread.start()
-    thread.join()
+    # no reason to run it always, we'll make it a app route call but we might not even use it
+    # main_stock_data()
     app.run(debug=True)
+    # thread = Thread(target = autopurchase,args = {})
+    # thread.start()
+    # thread.join()
+
