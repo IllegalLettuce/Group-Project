@@ -1,10 +1,14 @@
 <h2 mat-dialog-title>{{ data.name }}</h2>
 <mat-dialog-content>
   <div *ngIf="!isSubmitted && !ifError" class="dialog-form" id="main">
+    <p>Please input your buy and sell threshold below.
+      Our AI will manage the stock without requiring any input.
+      Funds generated will be allocated to your account.</p>
     <form [formGroup]="manageForm" (ngSubmit)="sendToLLM()">
       <div class="form-group">
         <label for="buy">Buy: </label>
         <input
+          placeholder="0.80"
           formControlName="buy"
           type="text"
           id="buy"
@@ -15,6 +19,7 @@
       <div class="form-group">
         <label for="sell">Sell: </label>
         <input
+          placeholder="0.80"
           formControlName="sell"
           type="text"
           id="sell"
@@ -24,6 +29,7 @@
       <div class="form-group">
         <label for="funds_dollar">Capital: </label>
         <input
+          placeholder="499.99"
           formControlName="funds_dollar"
           id="funds_dollar"
           type="text"
