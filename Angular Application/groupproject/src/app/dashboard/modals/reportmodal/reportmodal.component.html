@@ -10,12 +10,10 @@
       [value]="progressBar">
     </mat-progress-bar>
   </div>
-
   <div *ngIf="ifAnErrorHasOccurred">
     <img ngSrc="assets/monkey-rage.gif" alt="monkey at a desk throwing a laptop" height="124" width="220">
     <p>So sorry, an error occurred</p>
   </div>
-
   <div *ngIf="!isTheLLMLoading && responseFromLLM">
     <p>Date: {{responseFromLLM.date}}</p>
     <p>{{responseFromLLM.blog}}</p>
@@ -42,12 +40,9 @@
       </tr>
       </tbody>
     </table>
-
     <div>
       <button type="button" (click)="downloadResponseAsPDF()">Download PDF</button>
       <button type="button" (click)="closeModal()">Exit</button>
     </div>
-
   </div>
-
 </mat-dialog-content>

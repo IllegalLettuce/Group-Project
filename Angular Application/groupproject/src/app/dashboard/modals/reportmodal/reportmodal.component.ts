@@ -49,7 +49,6 @@ export class ReportmodalComponent implements OnInit {
     public dialogRef: MatDialogRef<ReportmodalComponent>
   ) {}
 
-
   ngOnInit() {
     const name = this.data.name;
     this.completelyRealAndNotFakeLoadingBar();
@@ -69,7 +68,7 @@ export class ReportmodalComponent implements OnInit {
         this.progressBar += Math.floor(Math.random() * (8 - 2 + 1)) + 2;
       }
       else if (this.progressBar > 80){
-        console.log("")
+        console.log()
       }
       else {
         clearInterval(this.progressInterval);
@@ -88,7 +87,6 @@ export class ReportmodalComponent implements OnInit {
         this.httpClient.post(uri_report, { params: { name } })
           .pipe(timeout(120000))
       );
-      console.log(this.responseFromLLM);
     } catch (error) {
       this.ifAnErrorHasOccurred = true;
     } finally {
