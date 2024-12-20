@@ -1,27 +1,32 @@
 package com.example.myapplication.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
-import com.example.myapplication.navigation.Screen
+import com.example.myapplication.database.PriceAlert
+import com.example.myapplication.database.getPriceAlerts
+
 
 @Composable
 fun PriceAlertScreen() {
+    var priceAlerts by remember { mutableStateOf<List<PriceAlert>>(emptyList()) }
+
+    // Fetch data from Firestore
+    LaunchedEffect(Unit) {
+        getPriceAlerts { alerts ->
+            priceAlerts = alerts
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -32,5 +37,38 @@ fun PriceAlertScreen() {
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(priceAlerts) { alert ->
+                PriceAlertCard(alert)
+            }
+        }
+    }
+}
+
+@Composable
+fun PriceAlertCard(alert: PriceAlert) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Ticker: ${alert.ticker}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "Name: ${alert.name}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Change: ${alert.change}",
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 }

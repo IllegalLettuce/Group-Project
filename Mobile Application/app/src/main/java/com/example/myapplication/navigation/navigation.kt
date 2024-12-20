@@ -7,7 +7,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.screens.HelpSupportScreen
 import com.example.myapplication.screens.HomeScreen
 import com.example.myapplication.screens.LoginScreen
-import com.example.myapplication.screens.PaymentScreen
 import com.example.myapplication.screens.PriceAlertScreen
 import com.example.myapplication.screens.PurchaseAssetsScreen
 import com.example.myapplication.screens.PurchasePremiumFunctionality
@@ -19,7 +18,6 @@ sealed class Screen(val route: String) {
     object Register : Screen("register")
     object Home : Screen("home")
     object PurchaseAssets : Screen("purchase_assets")
-    object Payment : Screen("payment")
     object PriceAlert : Screen("price_alert")
     object HelpSupport : Screen("help_support")
     object RatingReviewScreen : Screen("rating_review")
@@ -40,7 +38,6 @@ fun NavGraph() {
         composable(Screen.Register.route) { RegisterScreen(navController) }
         composable(Screen.Home.route) { HomeScreen(navController) }
         composable(Screen.PurchaseAssets.route) { PurchaseAssetsScreen() }
-        composable(Screen.Payment.route) { PaymentScreen() }
         composable(Screen.PriceAlert.route) { PriceAlertScreen() }
         composable(Screen.HelpSupport.route) { HelpSupportScreen(navController) }
         composable(Screen.RatingReviewScreen.route) { RatingReviewScreen(navController) }
