@@ -1,6 +1,13 @@
 package com.example.myapplication.database
+import com.example.myapplication.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+
+data class PriceAlert(
+    val ticker: String,
+    val name: String,
+    val change: String
+)
 
 fun registerUser(email: String, password: String, onComplete: (Boolean, String?) -> Unit) {
     val auth = FirebaseAuth.getInstance()
@@ -40,6 +47,25 @@ fun submitReview(rating: String, review: String, onComplete: (Boolean, String?) 
         }
         .addOnFailureListener { e ->
             onComplete(false, e.message)
+        }
+}
+
+fun getPriceAlerts(onComplete: (List<PriceAlert>) -> Unit) {
+    val firestore = FirebaseFirestore.getInstance()
+    firestore.collection("pricealerts")
+        .get()
+        .addOnSuccessListener { documents ->
+            val alerts = documents.map { document ->
+                PriceAlert(
+                    ticker = document.getString("ticker") ?: "",
+                    name = document.getString("name") ?: "",
+                    change = document.getString("change") ?: ""
+                )
+            }
+            onComplete(alerts)
+        }
+        .addOnFailureListener {
+            onComplete(emptyList())
         }
 }
 

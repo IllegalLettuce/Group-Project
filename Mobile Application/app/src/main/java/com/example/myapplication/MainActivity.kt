@@ -5,13 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
@@ -30,7 +27,6 @@ import com.example.myapplication.navigation.Screen
 import com.example.myapplication.screens.HelpSupportScreen
 import com.example.myapplication.screens.HomeScreen
 import com.example.myapplication.screens.LoginScreen
-import com.example.myapplication.screens.PaymentScreen
 import com.example.myapplication.screens.PriceAlertScreen
 import com.example.myapplication.screens.PurchaseAssetsScreen
 import com.example.myapplication.screens.RatingReviewScreen
@@ -72,7 +68,7 @@ fun MainApp() {
     val navItemList = listOf(
         NavItem(label = "Home", icon = Icons.Default.Home, screen = Screen.Home),
         NavItem(label = "Help", icon = Icons.Default.Person, screen = Screen.HelpSupport),
-        NavItem(label = "Payment", icon = Icons.Default.ShoppingCart, screen = Screen.Payment)
+        NavItem(label = "Stocks", icon = Icons.Default.ShoppingCart, screen = Screen.PurchaseAssets)
     )
 
     Scaffold(
@@ -111,7 +107,6 @@ fun MainApp() {
             composable(Screen.Login.route) { LoginScreen(navController) }
             composable(Screen.Register.route) { RegisterScreen(navController) }
             composable(Screen.Home.route) { HomeScreen(navController) }
-            composable(Screen.Payment.route) { PaymentScreen() }
             composable(Screen.PriceAlert.route) { PriceAlertScreen() }
             composable(Screen.PurchaseAssets.route) { PurchaseAssetsScreen() }
             composable(Screen.HelpSupport.route) { HelpSupportScreen(navController) }
