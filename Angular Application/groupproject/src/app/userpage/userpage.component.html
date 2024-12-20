@@ -1,6 +1,9 @@
 <app-navbar></app-navbar>
 <div class="container">
   <div *ngIf="isAdmin && !isManager">
+    <div *ngIf="isManager && !isAdmin">
+      <h2 class="text-center">Admin ID: {{adminID}} </h2>
+    </div>
     <h2 class="text-center">Your current funds: ${{userFunds?.capital}}</h2>
     <div class="form-container" *ngFor="let stock of managedStocks; let i = index">
       <p>Company: {{stock.company}}</p>
