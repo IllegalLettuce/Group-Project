@@ -33,18 +33,46 @@ export class ManagemodalComponent {
   ) {
     this.manageForm = this.builder.group({
       buy: ['',
-        [Validators.required,
-          Validators.pattern(/^100(\.0{1,2})?$|^\d{1,2}(\.\d{1,2})?$/)],
+        [Validators.required],
       ],
       sell: ['',
-        [Validators.required,
-          Validators.pattern(/^100(\.0{1,2})?$|^\d{1,2}(\.\d{1,2})?$/)],
+        [Validators.required],
       ],
       funds_dollar: ['',
-        [Validators.required,
-          Validators.pattern(/^\$?([1-9]\d*(,\d{3})*|0)(\.\d{1,2})?$/)]
+        [Validators.required]
       ],
     });
+  }
+
+  /**
+   * Format percentage input
+   */
+  formatPercentageInput(formField: string) {
+    let value = this.manageForm.get(formField)?.value;
+    value = value.replace(/\D/g, '');
+    let numericValue = Number(value);
+    if (numericValue < 1) {
+      numericValue = 1;
+    } else if (numericValue > 100) {
+      numericValue = 100;
+    }
+    value = numericValue.toString();
+    value = value + '%';
+    this.manageForm.get(formField)?.setValue(value, { emitEvent: false });
+  }
+
+
+  /**
+   * Form USD funds
+   */  // Format the input value to US dollar format and prepend the '$'
+  formatCurrencyInput() {
+    let value = this.manageForm.get('funds_dollar')?.value;
+    value = value.replace(/[^\d.-]/g, '');
+    if (value) {
+      value = Number(value).toLocaleString('en-US');
+      value = '$' + value;
+      this.manageForm.get('funds_dollar')?.setValue(value, { emitEvent: false });
+    }
   }
 
   /**

@@ -8,31 +8,33 @@
       <div class="form-group">
         <label for="buy">Buy: </label>
         <input
-          placeholder="0.80"
+          placeholder="80%"
           formControlName="buy"
           type="text"
           id="buy"
           name="buy"
-          required
+          (input)="formatPercentageInput('buy')"
         >
       </div>
       <div class="form-group">
         <label for="sell">Sell: </label>
         <input
-          placeholder="0.80"
+          placeholder="80%"
           formControlName="sell"
           type="text"
           id="sell"
           name="sell"
+          (input)="formatPercentageInput('sell')"
         >
       </div>
       <div class="form-group">
         <label for="funds_dollar">Capital: </label>
         <input
-          placeholder="499.99"
+          placeholder="$499.99"
           formControlName="funds_dollar"
           id="funds_dollar"
           type="text"
+          (input)="formatCurrencyInput()"
         />
       </div>
       <button type="submit" [disabled]="manageForm.invalid">Manage</button>

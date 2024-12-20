@@ -10,7 +10,6 @@
         placeholder="John"
         formControlName="name"
         required
-        [ngClass]="{ 'input-error': registerForm.get('name')?.invalid && registerForm.get('name')?.touched }"
       />
 
       <label for="surname">Surname</label>
@@ -20,18 +19,15 @@
         placeholder="Doe"
         formControlName="surname"
         required
-        [ngClass]="{ 'input-error': registerForm.get('surname')?.invalid && registerForm.get('surname')?.touched }"
       />
 
       <label for="email">Email</label>
       <input
         type="email"
         id="email"
-        name="email"
         placeholder="johndoe@gmail.com"
         formControlName="email"
         required
-        [ngClass]="{ 'input-error': registerForm.get('email')?.invalid && registerForm.get('email')?.touched }"
       />
 
       <label for="password">Password</label>
@@ -42,19 +38,27 @@
         placeholder="**********"
         formControlName="password"
         required
-        [ngClass]="{ 'input-error': registerForm.get('password')?.invalid && registerForm.get('password')?.touched }"
       />
+      <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.hasError('pattern')" class="error-message">
+        Password must be at least 8 characters long, contain one uppercase letter, one lowercase letter, and one number.
+      </div>
 
       <label for="confirmPassword">Confirm Password</label>
       <input
         type="password"
         id="confirmPassword"
-        name="confirmPassword"
         placeholder="**********"
         formControlName="confirmPassword"
         required
-        [ngClass]="{ 'input-error': registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched }"
       />
+      <div *ngIf="registerForm.get('confirmPassword')?.touched">
+        <div *ngIf="registerForm.get('confirmPassword')?.hasError('required')" class="error-message">
+          Confirm Password is required.
+        </div>
+        <div *ngIf="registerForm.get('confirmPassword')?.hasError('confirmedValidator')" class="error-message">
+          Confirm Password must match the Password.
+        </div>
+      </div>
 
       <label for="role">Role</label>
       <div id="role">
@@ -66,7 +70,6 @@
             formControlName="userType"
             (change)="adminOrManager()"
             required
-            [ngClass]="{ 'input-error': registerForm.get('userType')?.invalid && registerForm.get('userType')?.touched }"
           />
           Admin
         </label>
@@ -78,12 +81,11 @@
             formControlName="userType"
             (change)="adminOrManager()"
             required
-            [ngClass]="{ 'input-error': registerForm.get('userType')?.invalid && registerForm.get('userType')?.touched }"
           />
           Manager
         </label>
       </div>
-      <br>
+      <br />
 
       <div *ngIf="registerForm.get('userType')?.value === 'admin'">
         <label for="companyName">Company Name</label>
@@ -93,7 +95,6 @@
           placeholder="Enter company name"
           formControlName="companyName"
           required
-          [ngClass]="{ 'input-error': registerForm.get('companyName')?.invalid && registerForm.get('companyName')?.touched }"
         />
         <label for="funds">Funds</label>
         <input
@@ -102,13 +103,12 @@
           placeholder="Funds"
           formControlName="funds"
           required
-          [ngClass]="{ 'input-error': registerForm.get('funds')?.invalid && registerForm.get('funds')?.touched }"
+          (input)="formatCurrencyInput()"
         />
       </div>
 
       <div *ngIf="registerForm.get('userType')?.value === 'manager'">
         <label>Admin Emails (up to 5)</label>
-
         <div formArrayName="adminEmails">
           <div *ngFor="let emailControl of adminEmails.controls; let i = index">
             <div [formGroupName]="i">
@@ -117,12 +117,12 @@
                 placeholder="Enter admin email"
                 formControlName="email"
                 required
-                [ngClass]="{ 'input-error': emailControl.invalid && emailControl.touched }"
               />
               <button
                 type="button"
                 *ngIf="i !== 0"
-                (click)="removeEmail(i)">
+                (click)="removeEmail(i)"
+              >
                 Remove Email
               </button>
             </div>
@@ -132,7 +132,8 @@
         <button
           type="button"
           (click)="addEmail()"
-          [disabled]="adminEmails.length >= 5">
+          [disabled]="adminEmails.length >= 5"
+        >
           Add Email
         </button>
       </div>
@@ -148,3 +149,4 @@
     </form>
   </div>
 </div>
+

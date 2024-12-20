@@ -4,7 +4,7 @@ import {FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray} from
 import { environment } from '../../environments/environment.development';
 import {HttpClient} from "@angular/common/http";
 import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
-import {NgClass, NgForOf, NgIf} from "@angular/common";
+import {formatCurrency, NgClass, NgForOf, NgIf} from "@angular/common";
 
 
 @Component({
@@ -148,10 +148,7 @@ export class RegistrationComponent implements OnInit {
     return (formGroup: FormGroup) => {
       const control = formGroup.controls[controlName];
       const matchingControl = formGroup.controls[matchingControlName];
-      if (
-        matchingControl.errors &&
-        !matchingControl.errors["confirmedValidator"]
-      ) {
+      if (matchingControl.errors && !matchingControl.errors["confirmedValidator"]) {
         return;
       }
       if (control.value !== matchingControl.value) {
@@ -206,6 +203,19 @@ export class RegistrationComponent implements OnInit {
           console.error('Error during API call:', err);
         }
       });
+  }
+
+  /**
+   * Form USD funds
+   */  // Format the input value to US dollar format and prepend the '$'
+  formatCurrencyInput() {
+    let value = this.registerForm.get('funds')?.value;
+    value = value.replace(/[^\d.-]/g, '');
+    if (value) {
+      value = Number(value).toLocaleString('en-US');
+      value = '$' + value;
+      this.registerForm.get('funds')?.setValue(value, { emitEvent: false });
+    }
   }
 }
 
