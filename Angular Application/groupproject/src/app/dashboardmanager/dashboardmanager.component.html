@@ -1,10 +1,11 @@
 <app-navbar></app-navbar>
 <div class="container">
-  <h1>Dashboard Manager </h1>
+  <h1>Dashboard Manager</h1>
   <div class="form-container" *ngFor="let company of companies; let i = index">
     <h3>{{company.companyName}}</h3>
     <div>
       <button type="button" (click)="manageCompany(company.adminID)">Manage Company</button>
+      <button type="button" (click)="manageAdmin(company.adminID)">Manage Admin</button>
     </div>
   </div>
 </div>

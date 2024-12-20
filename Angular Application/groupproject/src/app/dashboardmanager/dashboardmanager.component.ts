@@ -49,8 +49,14 @@ export class DashboardmanagerComponent implements OnInit{
    * @param adminID
    */
   manageCompany(adminID: any){
-    console.log("Managing company with adminID:", adminID);
     this.router.navigate(['/dashboard'], { queryParams: { adminID } });
   }
 
+  /**
+   * Goes to the userpage for a specific admin
+   * @param adminID
+   */
+  manageAdmin(adminID: any) {
+    this.router.navigate(['/userpage'], { queryParams: { adminID } });
+  }
 }
