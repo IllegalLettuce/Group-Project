@@ -8,6 +8,9 @@ import {CommonModule} from "@angular/common";
 import {ManagemodalComponent} from "./modals/managemodal/managemodal.component";
 import { environment } from '../../environments/environment.development';
 import {HttpClient} from "@angular/common/http";
+import {getAuth} from "firebase/auth";
+import {ActivatedRoute} from "@angular/router";
+import { UserCheckService } from "../services/user-check.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -25,50 +28,47 @@ import {HttpClient} from "@angular/common/http";
 })
 
 export class DashboardComponent implements OnInit {
+  adminID: string | null = null;
   public data: any;
   stocks: {
-    graphUrl: any;
-    name: string, ticker: string }[] = [];
+    name: string,
+    ticker: string
+  }[] = [];
 
-  constructor(private dialog: MatDialog, private http: HttpClient) {}
+  constructor(
+    private dialog: MatDialog,
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private userCheck: UserCheckService
+  ) {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
     const uriGetStocks = environment.API_BASE_URL + '/getstocks';
     const requestBody = {};
+    const auth = getAuth();
+    const currentUserID = auth.currentUser?.uid || null;
+
+    this.route.queryParams.subscribe(async params => {
+      if (params['adminID']) {
+        this.adminID = params['adminID'];
+      } else if (currentUserID && await this.userCheck.isUserAnAdmin(currentUserID)) {
+        this.adminID = currentUserID;
+      }
+      if (!this.adminID) {
+        console.error("Admin ID could not be determined.");
+      } else {
+        console.log("Using adminID for dashboard:", this.adminID);
+      }
+    });
+
     this.http.post<any[]>(uriGetStocks, requestBody).subscribe(
       (response) => {
         this.stocks = response;
-        this.generateStockGraphs();
+        console.log(response);
       }
     );
   }
 
-  /**
-   * Creates the stock graphs for the dashboard
-   */
-  generateStockGraphs() {
-    const uri_graphs = environment.API_BASE_URL + "/generate_graphs";
-    const requestBody = { stocks: this.stocks };
-    this.http.post<{ status: string, graphs: Record<string, string> }>(uri_graphs, requestBody)
-      .subscribe(response => {
-        if (response.status === 'success') {
-          this.updateStockGraphs(response.graphs);
-        }
-      });
-  }
-
-  /**
-   * Updates the stocks for the dashboard
-   * @param graphs
-   */
-  updateStockGraphs(graphs: Record<string, string>) {
-    this.stocks = this.stocks.map(stock => {
-      const graphUrl = graphs[stock.name]
-        ? `${environment.API_BASE_URL}/graphs/${graphs[stock.name]}`
-        : undefined;
-      return { ...stock, graphUrl };
-    });
-  }
 
   /**
    * Controls the report dialog from the frontend
@@ -91,7 +91,12 @@ export class DashboardComponent implements OnInit {
   openManageDialog(name: string, ticker: string) {
     this.dialog.open(ManagemodalComponent, {
       width: '30em',
-      data: { name: name, ticker: ticker }
+      data: {
+        name: name,
+        ticker: ticker,
+        adminID: this.adminID
+      }
     });
   }
+
 }

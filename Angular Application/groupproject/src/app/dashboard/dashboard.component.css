@@ -65,8 +65,3 @@ button[type="button"] {
 button[type="button"]:hover {
   background-color: #1976D2;
 }
-
-.stock-graph {
-  max-width: 100%;
-  height: auto;
-}

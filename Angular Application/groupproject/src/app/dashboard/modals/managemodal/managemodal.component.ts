@@ -27,8 +27,8 @@ export class ManagemodalComponent {
   manageForm: FormGroup;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { name: string, ticker: string },
-    private httpClient: HttpClient,
+    @Inject(MAT_DIALOG_DATA) public data: { name: string, ticker: string, adminID: any },
+    private http: HttpClient,
     private builder: FormBuilder
   ) {
     this.manageForm = this.builder.group({
@@ -54,14 +54,16 @@ export class ManagemodalComponent {
     const uri_manage = this.uri + '/manage';
     const {buy, sell, funds_dollar} = this.manageForm.value;
     let message:JSON = <JSON><unknown>{
+      "userID" : this.data.adminID,
       "company": this.data.name,
       "ticker": this.data.ticker,
       "buy_percent": buy ,
       "sell_percent": sell,
       "funds_dollar": funds_dollar,
     };
+    let messageString = JSON.stringify(message)
     try{
-      this.httpClient.post(uri_manage, message)
+      this.http.post(uri_manage, messageString)
         .subscribe({
           next: (data: any) => {
           }, error: () => this.ifError = true
@@ -70,7 +72,7 @@ export class ManagemodalComponent {
     }catch(error){
       this.ifError = true;
       if (error instanceof HttpErrorResponse){
-        console.log("Unable to connect to the server. Please check your connection")
+        console.log("Unable to connect to the server. Please check your connection");
       }
     }
   };
