@@ -124,7 +124,7 @@ fun HelpSupportScreen(navController: NavHostController, modifier: Modifier = Mod
 
             Text(
                 text = "fixemaillater@gmail.com",
-                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary) // Keep this as primary color for visibility
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary)
             )
 
             Spacer(modifier = Modifier.height(32.dp))

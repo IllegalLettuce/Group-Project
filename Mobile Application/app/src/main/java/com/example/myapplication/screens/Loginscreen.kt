@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myapplication.R
-import com.example.myapplication.database.getCurrentUserId
 import com.example.myapplication.database.loginUser
 import com.example.myapplication.navigation.Screen
 import com.example.myapplication.setUserLoggedIn

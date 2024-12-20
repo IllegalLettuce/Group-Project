@@ -23,8 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.database.getCurrentUserId
-
-
 data class Stock(val name: String, val ticker: String)
 
 @Composable
@@ -41,7 +39,10 @@ fun PurchaseAssetsScreen(viewModel: FinancialInfoViewModel = viewModel()) {
         Stock(name = "Rheinmetall", ticker = "ETR:RHM"),
         Stock(name = "SAAB", ticker = "STO:SAAB-B"),
         Stock(name = "Hensoldt", ticker = "ETR:HAG"),
-        Stock(name = "Leonardo", ticker = "BIT:LDO")
+        Stock(name = "Leonardo", ticker = "BIT:LDO"),
+        Stock(name = "Dodge", ticker = ""),
+        Stock(name = "Bitcoin", ticker = ""),
+        Stock(name = "XHR", ticker = ""),
     )
 
     var showInfoDialog by remember { mutableStateOf(false) }
@@ -95,10 +96,6 @@ fun PurchaseAssetsScreen(viewModel: FinancialInfoViewModel = viewModel()) {
                             selectedStock = stock
                             showSellDialog = true
                         },
-                        onPriceClick = {
-                            selectedStock = stock
-                            showPriceDialog = true
-                        }
                     )
                 }
             }
@@ -136,24 +133,10 @@ fun PurchaseAssetsScreen(viewModel: FinancialInfoViewModel = viewModel()) {
                 }
             }
         }
-        if (showPriceDialog) {
-            selectedStock?.let {
-                if (userId != null) {
-                    PriceDialogue(
-                        stock = it,
-                        userId = userId,
-                        viewModel = viewModel,
-                        onDismiss = { showPriceDialog = false }
-                    )
-                }
-            }
-        }
     }
 }
-
-
 @Composable
-fun StockCard(stock: Stock, onInformationClick: () -> Unit, onPurchaseClick: (Stock) -> Unit, onSellClick: (Stock) -> Unit,onPriceClick: (Stock) -> Unit ) {
+fun StockCard(stock: Stock, onInformationClick: () -> Unit, onPurchaseClick: (Stock) -> Unit, onSellClick: (Stock) -> Unit,) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -191,11 +174,6 @@ fun StockCard(stock: Stock, onInformationClick: () -> Unit, onPurchaseClick: (St
                     onClick = {onSellClick(stock)},
                 ) {
                     Text("Sell")
-                }
-                TextButton(
-                    onClick = {onPriceClick(stock)},
-                ) {
-                    Text("Alert")
                 }
             }
         }
@@ -358,63 +336,6 @@ fun SellDialogue(
     )
 }
 
-@Composable
-fun PriceDialogue(
-    stock: Stock,
-    userId: String,
-    viewModel: FinancialInfoViewModel,
-    onDismiss: () -> Unit
-) {
-    var price by remember { mutableStateOf("") }
-    val isPriceValid = price.toIntOrNull() != null && price.toInt() > 0
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Sell ${stock.name}") },
-        text = {
-            Column {
-                Text("Enter the amount of shares:")
-                OutlinedTextField(
-                    value = price,
-                    onValueChange = { price = it },
-                    label = { Text("Price") },
-                    isError = !isPriceValid && price.isNotEmpty(),
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                )
-                if (!isPriceValid && price.isNotEmpty()) {
-                    Text(
-                        text = "Please enter a valid positive number.",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    if (isPriceValid) {
-                        viewModel.manageStock(
-                            ticker = stock.ticker,
-                            userId = userId,
-                            action = "Alert",
-                            amount = null
-                        )
-                        onDismiss()
-                    }
-                },
-                enabled = isPriceValid
-            ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
-}
 
 
 

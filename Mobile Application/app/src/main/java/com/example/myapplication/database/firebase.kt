@@ -1,5 +1,4 @@
 package com.example.myapplication.database
-import com.example.myapplication.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -68,8 +67,6 @@ fun getPriceAlerts(onComplete: (List<PriceAlert>) -> Unit) {
             onComplete(emptyList())
         }
 }
-
-
 fun getCurrentUserId(): String? {
     val user = FirebaseAuth.getInstance().currentUser
     return user?.uid

@@ -72,7 +72,6 @@ interface StockApiService {
 
 class StockViewModel : ViewModel() {
     private val _stock = MutableStateFlow<Stock?>(null)
-    val stock = _stock
 
     fun fetchStock(blog: String) {
         viewModelScope.launch {
@@ -94,8 +93,6 @@ class FinancialInfoViewModel : ViewModel() {
     private val _financialInfo = MutableStateFlow<Stock?>(null)
     val financialInfo: StateFlow<Stock?> get() = _financialInfo
 
-    private val _actionStatus = MutableStateFlow<String?>(null)
-    val actionStatus: StateFlow<String?> get() = _actionStatus
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -115,7 +112,7 @@ class FinancialInfoViewModel : ViewModel() {
         }
     }
 
-    fun manageStock(ticker: String, userId: String, amount: Int?, action: String,) {
+    fun manageStock(ticker: String, userId: String, amount: Int?, action: String) {
         viewModelScope.launch {
             try {
                 val request = amount?.let {

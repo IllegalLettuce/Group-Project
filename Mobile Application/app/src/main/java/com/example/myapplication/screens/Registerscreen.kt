@@ -105,7 +105,6 @@ fun RegisterScreen(navController: NavHostController) {
                             .padding(bottom = 24.dp)
                     )
 
-                    // Styled "Register" button
                     TextButton(
                         onClick = {
                             registerUser(email, password) { success, error ->
@@ -138,7 +137,6 @@ fun RegisterScreen(navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Styled "Login" button as a secondary action
                     TextButton(
                         onClick = { navController.navigate(Screen.Login.route) },
                         modifier = Modifier

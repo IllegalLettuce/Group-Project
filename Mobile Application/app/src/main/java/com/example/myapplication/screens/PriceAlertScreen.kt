@@ -20,14 +20,11 @@ import com.example.myapplication.database.getPriceAlerts
 @Composable
 fun PriceAlertScreen() {
     var priceAlerts by remember { mutableStateOf<List<PriceAlert>>(emptyList()) }
-
-    // Fetch data from Firestore
     LaunchedEffect(Unit) {
         getPriceAlerts { alerts ->
             priceAlerts = alerts
         }
     }
-
     Box(
         modifier = Modifier.fillMaxSize()
     ) {

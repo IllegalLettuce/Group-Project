@@ -36,7 +36,6 @@ fun PurchasePremiumFunctionality(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-
     )
     {
         Image(

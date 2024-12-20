@@ -61,10 +61,7 @@ fun MainApp() {
     val startDestination = if (isUserLoggedIn(navController.context)) Screen.Home.route else Screen.Login.route
     var selectedIndex by rememberSaveable { mutableStateOf(0) }
     val userId = getUserId(navController.context)
-
-
     val currentRoute = navController.currentBackStackEntryFlow.collectAsState(initial = navController.currentBackStackEntry).value?.destination?.route
-
     val navItemList = listOf(
         NavItem(label = "Home", icon = Icons.Default.Home, screen = Screen.Home),
         NavItem(label = "Help", icon = Icons.Default.Person, screen = Screen.HelpSupport),
