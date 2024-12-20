@@ -94,7 +94,6 @@
           id="companyName"
           placeholder="Enter company name"
           formControlName="companyName"
-          required
         />
         <label for="funds">Funds</label>
         <input
@@ -102,7 +101,6 @@
           id="funds"
           placeholder="Funds"
           formControlName="funds"
-          required
           (input)="formatCurrencyInput()"
         />
       </div>
@@ -116,7 +114,6 @@
                 type="email"
                 placeholder="Enter admin email"
                 formControlName="email"
-                required
               />
               <button
                 type="button"
