@@ -319,9 +319,6 @@ def main():
                 )
                 crew = Crew(agents=[researcher_agent, accountant_agent,recommender_agent, blogger_agent],
                             tasks=[researcher_task, accountant_task,recommender_task, blogger_task], verbose=True)
-
-                # crew = Crew(agents=[researcher_agent],
-                #             tasks=[researcher_task], verbose=True)
                 result = crew.kickoff()
 
                 result = str(result)
@@ -329,19 +326,16 @@ def main():
                 print(result)
 
                 output = format_output(result)
-                # for json
+
                 jsonobject = json.loads(output)
-                # actual implementation
-                return jsonobject
 
-
+                return jsonobject,200
 
             except Exception as e:
                 logging.error(f"Error during task execution: {e}")
-                output = "Sorry, an error occurred while processing your request."
 
-    # else:
-    #     return 'Welcome! Send a POST request to submit data.', 200
+    else:
+        return 'Welcome! Send a POST request to submit data.', 200
 
     # test at home
     # return render_template('index.html', query_input=query_input, output=output)
@@ -556,9 +550,11 @@ def home():
 
                 output = format_output(result)
                 # for json
-                # jsonobject = json.loads(output)
+                jsonobject = json.loads(output)
                 # actual implementation
                 # return jsonobject
+                return jsonify(jsonobject),200
+
 
 
 
@@ -803,14 +799,18 @@ def autopurchaseregister():
     if request.method == "POST":
 
         datainput = json.loads(request.data.decode('utf-8'))
-
-
         userid = datainput.get('userID')
         company = datainput.get('company')
         ticker = datainput.get('ticker')
-        buy_percent = int(float(datainput.get('buy_percent'))*100)
-        sell_percent = int(float(datainput.get('sell_percent'))*100)
-        funds = int(datainput.get('funds_dollar'))
+        buy_percent = str(datainput.get('buy_percent'))
+        sell_percent = str(datainput.get('sell_percent'))
+        funds = str(datainput.get('funds_dollar'))
+
+        buy_percent = int(buy_percent.replace("%",""))
+        sell_percent = int(sell_percent.replace("%",""))
+
+
+        funds = int(funds.replace("$",""))
         shares_owned = 0
 
         docs = (
@@ -862,14 +862,6 @@ def autopurchase():
 
             if docs:
                 for doc in docs:
-                    # shares_owned = doc.get('shares_owned')
-
-                    # company = doc.get('company')
-                    # buy = doc.get('buy_percent')
-                    # sell = doc.get('sell_percent')
-                    # funds = 0
-                    # user_id = doc.get('companyName')
-                    # fundsid = 0
                     userid = doc.get('userID')
                     company = doc.get('company')
                     ticker = doc.get('ticker')
