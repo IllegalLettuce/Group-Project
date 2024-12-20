@@ -704,7 +704,11 @@ def getstocks():
 @app.route('/useradmin',methods=['POST'])
 def useradmin():
     if request.method == "POST":
+<<<<<<< Updated upstream
         print(request.data)
+=======
+        print("admin")
+>>>>>>> Stashed changes
         datainput = json.loads(request.data.decode('utf-8'))
         userid = datainput.get('uid')
         print(userid)
@@ -717,9 +721,16 @@ def useradmin():
                 return jsonify({
                     'response':"yes"
                 }),200
+<<<<<<< Updated upstream
     return jsonify({
         'response':"no"
     }),200
+=======
+        return jsonify({
+            'response':"no"
+        }),200
+
+>>>>>>> Stashed changes
 
 
 
@@ -727,11 +738,19 @@ def useradmin():
 @app.route('/usermanager',methods=['POST'])
 def usermanager():
     if request.method == "POST":
+<<<<<<< Updated upstream
         print(request.data)
         datainput = json.loads(request.data.decode('utf-8'))
         userid = datainput.get('uid')
         docs = (
             db.collection("manager").stream()
+=======
+        print("manager")
+        datainput = json.loads(request.data.decode('utf-8'))
+        userid = datainput.get('uid')
+        docs = (
+            db.collection("managers").stream()
+>>>>>>> Stashed changes
         )
         docs = list(docs)
         for doc in docs:
@@ -739,9 +758,16 @@ def usermanager():
                 return jsonify({
                     'response':"yes"
                 }),200
+<<<<<<< Updated upstream
     return jsonify({
         'response':"no"
     }),200
+=======
+        return jsonify({
+            'response':"no"
+        }),200
+
+>>>>>>> Stashed changes
 
 
 @app.route('/userfunds',methods=['POST'])
