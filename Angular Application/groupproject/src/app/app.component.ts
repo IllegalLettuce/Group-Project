@@ -24,7 +24,7 @@ firebase.initializeApp(environment.firebase);
 })
 
 export class AppComponent {
-  title = 'groupproject';
+  title = 'Stocks TM';
 }
 
 
