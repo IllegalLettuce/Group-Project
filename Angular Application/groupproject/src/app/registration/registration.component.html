@@ -1,22 +1,60 @@
 <div class="register-container">
   <div class="register-left">
     <h1>Register</h1>
-      <p>A flat registration fee of 100 EURO is required</p>
+    <p>A flat registration fee of 100 EURO is required</p>
     <form [formGroup]="registerForm" (ngSubmit)="registerUser()">
       <label for="name">First Name</label>
-      <input type="text" id="name" placeholder="John" formControlName="name" required>
+      <input
+        type="text"
+        id="name"
+        placeholder="John"
+        formControlName="name"
+        required
+        [ngClass]="{ 'input-error': registerForm.get('name')?.invalid && registerForm.get('name')?.touched }"
+      />
 
       <label for="surname">Surname</label>
-      <input type="text" id="surname" placeholder="Doe" formControlName="surname" required>
+      <input
+        type="text"
+        id="surname"
+        placeholder="Doe"
+        formControlName="surname"
+        required
+        [ngClass]="{ 'input-error': registerForm.get('surname')?.invalid && registerForm.get('surname')?.touched }"
+      />
 
       <label for="email">Email</label>
-      <input type="email" id="email" name="email" placeholder="johndoe@gmail.com" formControlName="email" required>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="johndoe@gmail.com"
+        formControlName="email"
+        required
+        [ngClass]="{ 'input-error': registerForm.get('email')?.invalid && registerForm.get('email')?.touched }"
+      />
 
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="********************" formControlName="password" required>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="********************"
+        formControlName="password"
+        required
+        [ngClass]="{ 'input-error': registerForm.get('password')?.invalid && registerForm.get('password')?.touched }"
+      />
 
       <label for="confirmPassword">Confirm Password</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="********************" formControlName="confirmPassword" required>
+      <input
+        type="password"
+        id="confirmPassword"
+        name="confirmPassword"
+        placeholder="********************"
+        formControlName="confirmPassword"
+        required
+        [ngClass]="{ 'input-error': registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched }"
+      />
 
       <label for="role">Role</label>
       <div id="role">
@@ -28,6 +66,7 @@
             formControlName="userType"
             (change)="adminOrManager()"
             required
+            [ngClass]="{ 'input-error': registerForm.get('userType')?.invalid && registerForm.get('userType')?.touched }"
           />
           Admin
         </label>
@@ -39,6 +78,7 @@
             formControlName="userType"
             (change)="adminOrManager()"
             required
+            [ngClass]="{ 'input-error': registerForm.get('userType')?.invalid && registerForm.get('userType')?.touched }"
           />
           Manager
         </label>
@@ -53,6 +93,7 @@
           placeholder="Enter company name"
           formControlName="companyName"
           required
+          [ngClass]="{ 'input-error': registerForm.get('companyName')?.invalid && registerForm.get('companyName')?.touched }"
         />
         <label for="funds">Funds</label>
         <input
@@ -61,6 +102,7 @@
           placeholder="Funds"
           formControlName="funds"
           required
+          [ngClass]="{ 'input-error': registerForm.get('funds')?.invalid && registerForm.get('funds')?.touched }"
         />
       </div>
 
@@ -75,6 +117,7 @@
                 placeholder="Enter admin email"
                 formControlName="email"
                 required
+                [ngClass]="{ 'input-error': emailControl.invalid && emailControl.touched }"
               />
               <button
                 type="button"
@@ -94,8 +137,6 @@
         </button>
       </div>
 
-
-
       <button
         type="button"
         class="btn btn-signin"
@@ -107,5 +148,3 @@
     </form>
   </div>
 </div>
-
-

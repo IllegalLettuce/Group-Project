@@ -4,7 +4,7 @@ import {FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray} from
 import { environment } from '../../environments/environment.development';
 import {HttpClient} from "@angular/common/http";
 import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgClass, NgForOf, NgIf} from "@angular/common";
 
 
 @Component({
@@ -12,7 +12,7 @@ import {NgForOf, NgIf} from "@angular/common";
   standalone: true,
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.css'],
-  imports: [ReactiveFormsModule, NgIf, NgForOf]
+  imports: [ReactiveFormsModule, NgIf, NgForOf, NgClass]
 })
 export class RegistrationComponent implements OnInit {
   registerForm: FormGroup;
