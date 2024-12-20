@@ -5,10 +5,7 @@ import time
 from threading import Thread
 
 from google.cloud.firestore_v1 import FieldFilter
-from sympy.testing.runtests import method
 
-# from sagemaker.workflow.airflow import processing_config
-# from sympy import false
 
 import config
 from flask import Flask, request, render_template, jsonify
@@ -575,9 +572,42 @@ def home():
     # test at home
     return render_template('index.html', query_input=query_input, output=output)
 
+@app.route('/getcompanies', methods=['POST'])
+def getcompanies():
+    if request.method == 'POST':
+        datainput = json.loads(request.data.decode('utf-8'))
+        managerID = datainput.get('managerID')
+        adminarray = []
+        try:
+            docs = (
+                db.collection("managers").stream()
+            )
+            docs = list(docs)
+            for doc in docs:
+                if doc.id == managerID:
+                    adminarray = doc.get('adminID')
+                    break
+            adminsArray = []
+            docs = (
+                db.collection("admins").stream()
+            )
+            docs = list(docs)
+            for doc in docs:
+                for admin in adminarray:
+                    if doc.id == admin:
+                        adminsArray.append({
+                            'adminID':admin,
+                            'companyName':doc.get('companyName')
+                        })
+            return jsonify(adminsArray), 200
+        except Exception as e:
+            logging.error(f"Error during task execution: {e}")
+        return jsonify({
+            "status": "Error",
+            "message": "Invalid request or unhandled condition."
+        }), 400
 
-
-@app.route('/createuser',methods=['GET','POST'])
+@app.route('/createuser',methods=['POST'])
 def createuser():
 
     if request.method == "POST":
@@ -669,22 +699,107 @@ def getstocks():
     if request.method == "POST":
         return jsonify(stocks), 200
 
+
+
+@app.route('/useradmin',methods=['POST'])
+def useradmin():
+    if request.method == "POST":
+        print(request.data)
+        datainput = json.loads(request.data.decode('utf-8'))
+        userid = datainput.get('uid')
+        print(userid)
+        docs = (
+            db.collection("admins").stream()
+        )
+        docs = list(docs)
+        for doc in docs:
+            if doc.id == userid:
+                return jsonify({
+                    'response':"yes"
+                }),200
+    return jsonify({
+        'response':"no"
+    }),200
+
+
+
+
+@app.route('/usermanager',methods=['POST'])
+def usermanager():
+    if request.method == "POST":
+        print(request.data)
+        datainput = json.loads(request.data.decode('utf-8'))
+        userid = datainput.get('uid')
+        docs = (
+            db.collection("manager").stream()
+        )
+        docs = list(docs)
+        for doc in docs:
+            if doc.id == userid:
+                return jsonify({
+                    'response':"yes"
+                }),200
+    return jsonify({
+        'response':"no"
+    }),200
+
+
+@app.route('/userfunds',methods=['POST'])
+def getUserFunds():
+    if request.method == "POST":
+        print(request.data)
+        datainput = json.loads(request.data.decode('utf-8'))
+        userid = datainput.get('uid')
+        docs = (
+            db.collection("admins").stream()
+        )
+        capital = 0
+        docs = list(docs)
+        for doc in docs:
+            if doc.id == userid:
+                capital = doc.get('capital')
+                return jsonify({
+                    'capital':capital
+                }),200
+        return jsonify({
+            'capital':capital
+        }),200
+
+
+
 #this will be the autopurchase when its done
 @app.route('/manage', methods=['POST', 'OPTIONS'])
 def autopurchaseregister():
     if request.method == "POST":
+
         datainput = json.loads(request.data.decode('utf-8'))
-        stockName = datainput.get('name')
-        ticker = datainput.get('Ticker')
-        funds = int(datainput.get('funds'))
-        userid = datainput.get('companyName')
-        buy = int(datainput.get('buy'))
-        sell = int(datainput.get('sell'))
+
+
+        userid = datainput.get('userID')
+        company = datainput.get('company')
+        ticker = datainput.get('ticker')
+        buy_percent = int(float(datainput.get('buy_percent'))*100)
+        sell_percent = int(float(datainput.get('sell_percent'))*100)
+        funds = int(datainput.get('funds_dollar'))
         shares_owned = 0
 
+        docs = (
+            db.collection("admins").stream()
+        )
+
+        adminobject = 0
+        docs = list(docs)
+        for doc in docs:
+            if doc.id == userid:
+                adminobject = doc
+                break
+        capital = adminobject.get('capital')
+        if capital >= funds:
+            capital -= funds
+
         try:
-            db.collection("autopurchase").document().create({"userid":userid , "company":stockName,"ticker":ticker, "shares_owned": shares_owned,"buy_percent":buy,"sell_percent":sell})
-            db.collection("funds").document().create({"userid":userid, "funds":funds})
+            db.collection("autopurchase").document().create({"userid":userid , "company":company,"ticker":ticker, "shares_owned": shares_owned,"buy_percent":buy_percent,"sell_percent":sell_percent,'funds_dollar':funds})
+            db.collection('admins').document(userid).set({"capital":capital},merge=True)
             return jsonify({
                 "status": "Success",
                 "message": "Autopurchase set up"
@@ -717,31 +832,29 @@ def autopurchase():
 
             if docs:
                 for doc in docs:
-                    shares_owned = doc.get('shares_owned')
-                    document_id = doc.id
+                    # shares_owned = doc.get('shares_owned')
+
+                    # company = doc.get('company')
+                    # buy = doc.get('buy_percent')
+                    # sell = doc.get('sell_percent')
+                    # funds = 0
+                    # user_id = doc.get('companyName')
+                    # fundsid = 0
+                    userid = doc.get('userID')
                     company = doc.get('company')
-                    buy = doc.get('buy_percent')
-                    sell = doc.get('sell_percent')
-                    funds = 0
-                    user_id = doc.get('companyName')
-                    fundsid = 0
-
-                    funddocs = (
-                        db.collection("admin").stream()
-                    )
-
-                    funddocs = list(funddocs)
-                    for funds in funddocs:
-                        if funds.get('companyName') == user_id:
-                            funds.get('capital')
-                            fundsid = funds.id
+                    ticker = doc.get('ticker')
+                    buy_percent = int(doc.get('buy_percent'))
+                    sell_percent = int(doc.get('sell_percent'))
+                    funds = int(doc.get('funds_dollar'))
+                    shares_owned = 0
+                    document_id = doc.id
 
 
                     company_stock = stock_data[company]
                     lastitemdate = list(company_stock)[-1]
                     closingorice = company_stock[lastitemdate]['Close']
                     autopurchase_task = Task(
-                        description="From the data given here make a prediction as to whether it is a good idea to buy or sell the stock of this given company "+ str(company_stock),
+                        description="From the data given here make a prediction as to whether it is a good idea to buy or sell the stock with the ticker of "+ ticker  +" and the previous 7 days data of "+ str(company_stock),
                         agent=autopurchase_agent,
                         expected_output="I expect the output to be given like this as whole numbers, just numbers even if its 0 and nothing more."
                                         "{"
@@ -763,20 +876,33 @@ def autopurchase():
                     #if the buy from agent is greater than the given from user, then go ahead and buy as many stocks as possible until you can buy anymore
                     #then save that into the firebase database
 
-                    if int(agent_buy)>=buy and funds > closingorice:
+                    if int(agent_buy)>= buy_percent and funds > closingorice:
                         shares_owned  += funds / closingorice
                         funds -= shares_owned*closingorice
-                        db.collection("autopurchase").document(document_id).set({ "shares_owned": shares_owned}, merge=True)
-                        db.collection("funds").document(fundsid).set({"funds":funds}, merge=True)
+                        db.collection("autopurchase").document(document_id).set({ "shares_owned": shares_owned,'funds_dollar':funds}, merge=True)
 
                         #save share bought , ticker, user id into database so it can be retrieved for future use
                     else:
-                        if agent_sell >= sell and shares_owned > 0:
+                        if agent_sell >= sell_percent and shares_owned > 0:
                             #get the share from database and sell them all
                             newfunds = closingorice * shares_owned
                             shares_owned = 0
-                            db.collection("autopurchase").document(document_id).set({ "shares_owned": shares_owned}, merge=True)
-                            db.collection("funds").document(fundsid).set({"funds":newfunds}, merge=True)
+                            docs = (
+                                db.collection("admins").stream()
+                            )
+
+                            adminobject = 0
+                            docs = list(docs)
+                            for doc in docs:
+                                if doc.id == userid:
+                                    adminobject = doc
+                                    break
+                            capital = adminobject.get('capital')
+                            capital += newfunds
+                            db.collection("autopurchase").document(document_id).delete()
+                            db.collection("admins").document(userid).set({'capital': capital})
+
+
         except Exception as e:
             logging.error(f"Error during task execution: {e}")
         time.sleep(1000)
