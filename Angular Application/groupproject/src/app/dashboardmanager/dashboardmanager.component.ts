@@ -38,7 +38,6 @@ export class DashboardmanagerComponent implements OnInit{
     this.http.post<any[]>(uriGetCompanies, json_manager).subscribe(
       (response)=>{
         this.companies = response;
-        console.log(response);
       }
     )
   }
