@@ -31,14 +31,6 @@ def autopurchase(db):
 
             if docs:
                 for doc in docs:
-                    # shares_owned = doc.get('shares_owned')
-
-                    # company = doc.get('company')
-                    # buy = doc.get('buy_percent')
-                    # sell = doc.get('sell_percent')
-                    # funds = 0
-                    # user_id = doc.get('companyName')
-                    # fundsid = 0
                     userid = doc.get('userid')
                     company = doc.get('company')
                     ticker = doc.get('ticker')
