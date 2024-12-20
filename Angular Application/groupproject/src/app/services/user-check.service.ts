@@ -11,7 +11,6 @@ import {lastValueFrom} from "rxjs";
 export class UserCheckService {
   uri = environment.API_BASE_URL
   constructor(
-    private firestore: Firestore,
     private http: HttpClient
   ) { }
 
