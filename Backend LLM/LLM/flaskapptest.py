@@ -78,7 +78,6 @@ def stock_recommendation():
         return output
 
 # Define route for home page
-
 @app.route('/report', methods=['GET', 'POST'])
 def main():
     query_input = None
@@ -239,9 +238,6 @@ def autopurchaseregister():
         "status": "Error",
         "message": "Invalid request or unhandled condition."
     }), 400
-
-
-
 @app.route('/managestock', methods=['POST','OPTIONS'])
 def burorsell():
     if request.method == "POST":
@@ -435,7 +431,7 @@ def home():
 
                 output = format_output(result)
                 # for json
-                # jsonobject = json.loads(output)
+                jsonobject = json.loads(output)
                 # actual implementation
                 # return jsonobject
 
@@ -451,56 +447,330 @@ def home():
     # test at home
     return render_template('index.html', query_input=query_input, output=output)
 
-@app.route('/createuser',methods=['GET','POST'])
+# @app.route('/createuser',methods=['GET','POST'])
+# def createuser():
+
+#     if request.method == "POST":
+#         datainput = json.loads(request.data.decode('utf-8'))
+#         name = datainput.get('name')
+#         surname = datainput.get('surname')
+#         password = datainput.get('password')
+#         email = datainput.get('email')
+#         userType = datainput.get('userType')
+#         createdAt = str(datetime.date.today())
+#         try:
+#             user_record = auth.create_user(
+#                 email=email,
+#                 password=password,
+#                 display_name=name
+#             )
+#             user_id = user_record.uid
+#             user_ref = db.collection('users').document(user_id)
+#             user_ref.set({
+#                 'name': name,
+#                 'surname':surname,
+#                 'email': email,
+#                 'userType': userType,
+#                 'createdAt': createdAt
+#             })
+#             # db.collection("users").document().create({"name":name ,"surname":surname, "email": email, "userType": userType,"createdAt":createdAt})
+#             return jsonify({
+#                 "message":"created"
+#             }), 200
+#         except Exception as e:
+#             logging.error(f"Error during task execution: {e}")
+
+#     return jsonify({
+#         "message":"Invalid Method"
+#     }), 400
+
+
+
+# @app.route('/getstocks',methods=['POST'])
+# def getstocks():
+#     print(request.data)
+#     if request.method == "POST":
+#         return jsonify(stocks), 200
+######################################################################
+
+@app.route('/getcompanies', methods=['POST'])
+def getcompanies():
+    if request.method == 'POST':
+        datainput = json.loads(request.data.decode('utf-8'))
+        managerID = datainput.get('managerID')
+        adminarray = []
+        try:
+            docs = (
+                db.collection("managers").stream()
+            )
+            docs = list(docs)
+            for doc in docs:
+                if doc.id == managerID:
+                    adminarray = doc.get('adminID')
+                    break
+            adminsArray = []
+            docs = (
+                db.collection("admins").stream()
+            )
+            docs = list(docs)
+            for doc in docs:
+                for admin in adminarray:
+                    if doc.id == admin:
+                        adminsArray.append({
+                            'adminID':admin,
+                            'companyName':doc.get('companyName')
+                        })
+            return jsonify(adminsArray), 200
+        except Exception as e:
+            logging.error(f"Error during task execution: {e}")
+        return jsonify({
+            "status": "Error",
+            "message": "Invalid request or unhandled condition."
+        }), 400
+
+@app.route('/createuser',methods=['POST'])
 def createuser():
 
     if request.method == "POST":
         datainput = json.loads(request.data.decode('utf-8'))
-        name = datainput.get('name')
-        surname = datainput.get('surname')
-        password = datainput.get('password')
-        email = datainput.get('email')
         userType = datainput.get('userType')
-        createdAt = str(datetime.date.today())
-        try:
-            user_record = auth.create_user(
-                email=email,
-                password=password,
-                display_name=name
-            )
-            user_id = user_record.uid
-            user_ref = db.collection('users').document(user_id)
-            user_ref.set({
-                'name': name,
-                'surname':surname,
-                'email': email,
-                'userType': userType,
-                'createdAt': createdAt
-            })
-            # db.collection("users").document().create({"name":name ,"surname":surname, "email": email, "userType": userType,"createdAt":createdAt})
-            return jsonify({
-                "message":"created"
-            }), 200
-        except Exception as e:
-            logging.error(f"Error during task execution: {e}")
-
+        if userType == "admin":
+            try:
+                name = datainput.get('name')
+                password = datainput.get('password')
+                email = datainput.get('email')
+                capital = int(datainput.get('funds'))
+                companyName = datainput.get('companyName')
+                user_record = auth.create_user(
+                    email=email,
+                    password=password,
+                    display_name=name
+                )
+                user_id = user_record.uid
+                user_ref = db.collection('admins').document(user_id)
+                user_ref.set({
+                    'capital':capital,
+                    'companyName':companyName
+                })
+                return jsonify({
+                    "message":"created"
+                }), 200
+            except Exception as e:
+                logging.error(f"Error during task execution: {e}")
+        elif userType == "manager":
+            try:
+                name = datainput.get('name')
+                password = datainput.get('password')
+                email = datainput.get('email')
+                user_record = auth.create_user(
+                    email=email,
+                    password=password,
+                    display_name=name
+                )
+                user_id = user_record.uid
+                emails = datainput.get('adminEmails')
+                matching_user_ids = []
+                page = auth.list_users()
+                while page:
+                    for user in page.users:
+                        for email in emails:
+                            if user.email == email:
+                                matching_user_ids.append(user.uid)
+                    page = page.get_next_page()
+                user_ref = db.collection('managers').document(user_id)
+                user_ref.set({
+                    'adminID':matching_user_ids
+                })
+                return jsonify({
+                    "message":"created"
+                }), 200
+            except Exception as e:
+                logging.error(f"Error during task execution: {e}")
     return jsonify({
         "message":"Invalid Method"
     }), 400
 
+
+
+@app.route('/addadmin',methods=['POST'])
+
+def addadmin():
+    if request.method == 'POST':
+        datainput = json.loads(request.data.decode('utf-8'))
+        managerid = datainput.get('managerID')
+        email = datainput.get('email')
+        matching_user_ids = []
+        page = auth.list_users()
+        while page:
+            for user in page.users:
+                if user.email == email:
+                    matching_user_ids.append(user.uid)
+            page = page.get_next_page()
+        manager = db.collection("manager").document(managerid)
+        from google.cloud import firestore
+        manager.update({"adminID":firestore.ArrayUnion([matching_user_ids])})
+        return jsonify({
+            "message":"Updated manager with more admins"
+        }), 200
+
+
+
 @app.route('/getstocks',methods=['POST'])
 def getstocks():
-    print(request.data)
     if request.method == "POST":
         return jsonify(stocks), 200
+
+
+
+@app.route('/useradmin',methods=['POST'])
+def useradmin():
+    if request.method == "POST":
+        print("admin")
+        datainput = json.loads(request.data.decode('utf-8'))
+        userid = datainput.get('uid')
+        print(userid)
+        docs = (
+            db.collection("admins").stream()
+        )
+        docs = list(docs)
+        for doc in docs:
+            if doc.id == userid:
+                return jsonify({
+                    'response':"yes"
+                }),200
+        return jsonify({
+            'response':"no"
+        }),200
+
+
+
+
+
+@app.route('/usermanager',methods=['POST'])
+def usermanager():
+    if request.method == "POST":
+        print("manager")
+        datainput = json.loads(request.data.decode('utf-8'))
+        userid = datainput.get('uid')
+        docs = (
+            db.collection("managers").stream()
+        )
+        docs = list(docs)
+        for doc in docs:
+            if doc.id == userid:
+                return jsonify({
+                    'response':"yes"
+                }),200
+        return jsonify({
+            'response':"no"
+        }),200
+
+
+
+@app.route('/userfunds',methods=['POST'])
+def getUserFunds():
+    if request.method == "POST":
+        print(request.data)
+        datainput = json.loads(request.data.decode('utf-8'))
+        userid = datainput.get('uid')
+        docs = (
+            db.collection("admins").stream()
+        )
+        capital = 0
+        docs = list(docs)
+        for doc in docs:
+            if doc.id == userid:
+                capital = doc.get('capital')
+                return jsonify({
+                    'capital':capital
+                }),200
+        return jsonify({
+            'capital':capital
+        }),200
+
+
+@app.route('/managedstocks',methods=['POST'])
+def managedstocks():
+    if request.method == "POST":
+        datainput = json.loads(request.data.decode('utf-8'))
+        userid = str(datainput.get('userID'))
+        docs = (
+            db.collection("autopurchase").stream()
+        )
+        docs = list(docs)
+        managedStocks = []
+        if docs:
+            for doc in docs:
+                if doc.get('userid') == userid:
+                    managedStocks.append({
+                        "buy_percent":doc.get('buy_percent'),
+                        "sell_percent":doc.get('sell_percent'),
+                        "company":doc.get('company'),
+                        "funds_dollar":doc.get('funds_dollar'),
+                        "shares_owned":doc.get('shares_owned'),
+                        "ticker":doc.get('ticker')
+                    })
+        print(managedStocks)
+        return jsonify(managedStocks), 200
+    return jsonify({
+        "status": "Error",
+        "message": "Invalid request or unhandled condition."
+    }), 400
+
+
+#this will be the autopurchase when its done
+@app.route('/manage', methods=['POST', 'OPTIONS'])
+def autopurchaseregister():
+    if request.method == "POST":
+
+        datainput = json.loads(request.data.decode('utf-8'))
+
+
+        userid = datainput.get('userID')
+        company = datainput.get('company')
+        ticker = datainput.get('ticker')
+        buy_percent = int(float(datainput.get('buy_percent'))*100)
+        sell_percent = int(float(datainput.get('sell_percent'))*100)
+        funds = int(datainput.get('funds_dollar'))
+        shares_owned = 0
+
+        docs = (
+            db.collection("admins").stream()
+        )
+
+        adminobject = 0
+        docs = list(docs)
+        for doc in docs:
+            if doc.id == userid:
+                adminobject = doc
+                break
+        capital = adminobject.get('capital')
+        if capital >= funds:
+            capital -= funds
+
+        try:
+            db.collection("autopurchase").document().create({"userid":userid , "company":company,"ticker":ticker, "shares_owned": shares_owned,"buy_percent":buy_percent,"sell_percent":sell_percent,'funds_dollar':funds})
+            db.collection('admins').document(userid).set({"capital":capital},merge=True)
+            return jsonify({
+                "status": "Success",
+                "message": "Autopurchase set up"
+            }), 200
+        except Exception as e:
+            logging.error(f"Error during task execution: {e}")
+    return jsonify({
+        "status": "Error",
+        "message": "Invalid request or unhandled condition."
+    }), 400
 
 if __name__ == '__main__':
     # no reason to run it always, we'll make it a app route call but we might not even use it
     main_stock_data()
-    app.run(debug=True)
-    thread = Thread(target=autopurchase, args=(db,))
-    # thread = Thread(target = autopurchase,args = {})
-    thread.start()
     
+    app.run(debug=True)
+    ###############THIS ONE FOR AUTO PURCHASE#################
+    thread = Thread(target=autopurchase, args=(db,))
+    ##########################################################
+    ###RUNS ON THE AUTOPURCHASE FLE NOW  # thread = Thread(target = autopurchase,args = {})
+    thread.start()
     thread.join()
     
