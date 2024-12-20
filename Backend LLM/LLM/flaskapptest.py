@@ -196,48 +196,7 @@ def main():
                 logging.error(f"Error during task execution: {e}")
                 output = "Sorry, an error occurred while processing your request."
 ############################################################################################################
-@app.route('/manage', methods=['POST', 'OPTIONS'])
-def autopurchaseregister():
-    if request.method == "POST":
 
-        datainput = json.loads(request.data.decode('utf-8'))
-
-
-        userid = datainput.get('userID')
-        company = datainput.get('company')
-        ticker = datainput.get('ticker')
-        buy_percent = int(float(datainput.get('buy_percent'))*100)
-        sell_percent = int(float(datainput.get('sell_percent'))*100)
-        funds = int(datainput.get('funds_dollar'))
-        shares_owned = 0
-
-        docs = (
-            db.collection("admins").stream()
-        )
-
-        adminobject = 0
-        docs = list(docs)
-        for doc in docs:
-            if doc.id == userid:
-                adminobject = doc
-                break
-        capital = adminobject.get('capital')
-        if capital >= funds:
-            capital -= funds
-
-        try:
-            db.collection("autopurchase").document().create({"userid":userid , "company":company,"ticker":ticker, "shares_owned": shares_owned,"buy_percent":buy_percent,"sell_percent":sell_percent,'funds_dollar':funds})
-            db.collection('admins').document(userid).set({"capital":capital},merge=True)
-            return jsonify({
-                "status": "Success",
-                "message": "Autopurchase set up"
-            }), 200
-        except Exception as e:
-            logging.error(f"Error during task execution: {e}")
-    return jsonify({
-        "status": "Error",
-        "message": "Invalid request or unhandled condition."
-    }), 400
 @app.route('/managestock', methods=['POST','OPTIONS'])
 def burorsell():
     if request.method == "POST":
@@ -322,7 +281,22 @@ def home():
         # test at home
         query_input = request.form.get('query-input')
 
+
+
+        # actual implementation
+        # query_input = json.loads(request.data.decode('utf-8'))
+        # query_input = request.data
+        # companyname = query_input.get('company')
+        # print(companyname)
+
+
+
+
         if query_input:
+
+            ##TESTING
+
+
 
 
             try:
@@ -434,6 +408,8 @@ def home():
                 jsonobject = json.loads(output)
                 # actual implementation
                 # return jsonobject
+                #return jsonify(jsonobject),200
+
 
 
 
@@ -447,50 +423,6 @@ def home():
     # test at home
     return render_template('index.html', query_input=query_input, output=output)
 
-# @app.route('/createuser',methods=['GET','POST'])
-# def createuser():
-
-#     if request.method == "POST":
-#         datainput = json.loads(request.data.decode('utf-8'))
-#         name = datainput.get('name')
-#         surname = datainput.get('surname')
-#         password = datainput.get('password')
-#         email = datainput.get('email')
-#         userType = datainput.get('userType')
-#         createdAt = str(datetime.date.today())
-#         try:
-#             user_record = auth.create_user(
-#                 email=email,
-#                 password=password,
-#                 display_name=name
-#             )
-#             user_id = user_record.uid
-#             user_ref = db.collection('users').document(user_id)
-#             user_ref.set({
-#                 'name': name,
-#                 'surname':surname,
-#                 'email': email,
-#                 'userType': userType,
-#                 'createdAt': createdAt
-#             })
-#             # db.collection("users").document().create({"name":name ,"surname":surname, "email": email, "userType": userType,"createdAt":createdAt})
-#             return jsonify({
-#                 "message":"created"
-#             }), 200
-#         except Exception as e:
-#             logging.error(f"Error during task execution: {e}")
-
-#     return jsonify({
-#         "message":"Invalid Method"
-#     }), 400
-
-
-
-# @app.route('/getstocks',methods=['POST'])
-# def getstocks():
-#     print(request.data)
-#     if request.method == "POST":
-#         return jsonify(stocks), 200
 ######################################################################
 
 @app.route('/getcompanies', methods=['POST'])
@@ -591,7 +523,6 @@ def createuser():
     }), 400
 
 
-
 @app.route('/addadmin',methods=['POST'])
 
 def addadmin():
@@ -612,6 +543,7 @@ def addadmin():
         return jsonify({
             "message":"Updated manager with more admins"
         }), 200
+
 
 
 
@@ -641,7 +573,6 @@ def useradmin():
         return jsonify({
             'response':"no"
         }),200
-
 
 
 
@@ -688,7 +619,6 @@ def getUserFunds():
             'capital':capital
         }),200
 
-
 @app.route('/managedstocks',methods=['POST'])
 def managedstocks():
     if request.method == "POST":
@@ -718,20 +648,24 @@ def managedstocks():
     }), 400
 
 
-#this will be the autopurchase when its done
+
 @app.route('/manage', methods=['POST', 'OPTIONS'])
 def autopurchaseregister():
     if request.method == "POST":
 
         datainput = json.loads(request.data.decode('utf-8'))
-
-
         userid = datainput.get('userID')
         company = datainput.get('company')
         ticker = datainput.get('ticker')
-        buy_percent = int(float(datainput.get('buy_percent'))*100)
-        sell_percent = int(float(datainput.get('sell_percent'))*100)
-        funds = int(datainput.get('funds_dollar'))
+        buy_percent = str(datainput.get('buy_percent'))
+        sell_percent = str(datainput.get('sell_percent'))
+        funds = str(datainput.get('funds_dollar'))
+
+        buy_percent = int(buy_percent.replace("%",""))
+        sell_percent = int(sell_percent.replace("%",""))
+
+
+        funds = int(funds.replace("$",""))
         shares_owned = 0
 
         docs = (
@@ -762,6 +696,7 @@ def autopurchaseregister():
         "message": "Invalid request or unhandled condition."
     }), 400
 
+
 if __name__ == '__main__':
     # no reason to run it always, we'll make it a app route call but we might not even use it
     main_stock_data()
@@ -772,5 +707,5 @@ if __name__ == '__main__':
     ##########################################################
     ###RUNS ON THE AUTOPURCHASE FLE NOW  # thread = Thread(target = autopurchase,args = {})
     thread.start()
-    thread.join()
+    # thread.join()
     
