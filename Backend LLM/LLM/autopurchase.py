@@ -8,6 +8,8 @@ from firebase_admin import credentials, auth
 from firebase_admin import firestore
 from crewai import Task, Crew
 from agents import autopurchase_agent
+
+
 def autopurchase(db):
 
     while(True):
@@ -29,33 +31,31 @@ def autopurchase(db):
 
             if docs:
                 for doc in docs:
-                    shares_owned = doc.get('shares_owned')
-                    document_id = doc.id
+                    # shares_owned = doc.get('shares_owned')
+
+                    # company = doc.get('company')
+                    # buy = doc.get('buy_percent')
+                    # sell = doc.get('sell_percent')
+                    # funds = 0
+                    # user_id = doc.get('companyName')
+                    # fundsid = 0
+                    userid = doc.get('userid')
                     company = doc.get('company')
-                    buy = doc.get('buy_percent')
-                    sell = doc.get('sell_percent')
-                    funds = 0
-                    user_id = doc.get('companyName')
-                    fundsid = 0
-
-                    funddocs = (
-                        db.collection("admins").stream()
-                    )
-
-                    funddocs = list(funddocs)
-                    for funds in funddocs:
-                        if funds.get('companyName') == user_id:
-                            funds.get('capital')
-                            fundsid = funds.id
+                    ticker = doc.get('ticker')
+                    buy_percent = int(doc.get('buy_percent'))
+                    sell_percent = int(doc.get('sell_percent'))
+                    funds = int(doc.get('funds_dollar'))
+                    shares_owned = 0
+                    document_id = doc.id
 
 
                     company_stock = stock_data[company]
                     lastitemdate = list(company_stock)[-1]
                     closingorice = company_stock[lastitemdate]['Close']
                     autopurchase_task = Task(
-                        description="From the data given here make a prediction as to whether it is a good idea to buy or sell the stock of this given company "+ str(company_stock),
+                        description="From the data given here make a prediction as to whether it is a good idea to buy or sell the stock with the ticker of "+ ticker  +" and the previous 7 days data of "+ str(company_stock),
                         agent=autopurchase_agent,
-                        expected_output="I expect the output to be given like this as whole numbers, do not put string, just numbers even if its 0 and nothing more."
+                        expected_output="I expect the output to be given like this as whole numbers, just numbers even if its 0 and nothing more."
                                         "{"
                                         '"Buy"": "x%",'
                                         '"Sell": "z%"'
@@ -75,20 +75,33 @@ def autopurchase(db):
                     #if the buy from agent is greater than the given from user, then go ahead and buy as many stocks as possible until you can buy anymore
                     #then save that into the firebase database
 
-                    if int(agent_buy)>=buy and funds > closingorice:
+                    if int(agent_buy)>= buy_percent and funds > closingorice:
                         shares_owned  += funds / closingorice
                         funds -= shares_owned*closingorice
-                        db.collection("autopurchase").document(document_id).set({ "shares_owned": shares_owned}, merge=True)
-                        db.collection("funds").document(fundsid).set({"funds":funds}, merge=True)
+                        db.collection("autopurchase").document(document_id).set({ "shares_owned": shares_owned,'funds_dollar':funds}, merge=True)
 
                         #save share bought , ticker, user id into database so it can be retrieved for future use
                     else:
-                        if agent_sell >= sell and shares_owned > 0:
+                        if agent_sell >= sell_percent and shares_owned > 0:
                             #get the share from database and sell them all
                             newfunds = closingorice * shares_owned
                             shares_owned = 0
-                            db.collection("autopurchase").document(document_id).set({ "shares_owned": shares_owned}, merge=True)
-                            db.collection("funds").document(fundsid).set({"funds":newfunds}, merge=True)
+                            docs = (
+                                db.collection("admins").stream()
+                            )
+
+                            adminobject = 0
+                            docs = list(docs)
+                            for doc in docs:
+                                if doc.id == userid:
+                                    adminobject = doc
+                                    break
+                            capital = adminobject.get('capital')
+                            capital += newfunds
+                            db.collection("autopurchase").document(document_id).delete()
+                            db.collection("admins").document(userid).set({'capital': capital})
+
+
         except Exception as e:
             logging.error(f"Error during task execution: {e}")
         time.sleep(1000)

@@ -17,11 +17,9 @@ os.environ["OPENAI_API_KEY"] = config.chatopenaiapikey
 
 # Initialize LLMs
 ollama3 = LLM(model="ollama/llama3.2", base_url="http://localhost:11434")
-Gllm = ChatGroq(
-    temperature=0.3,
-    max_tokens=4096,
-    model_name="llama3-70b-8192"
-)
+Gllm = ChatGroq(model_name="groq/llama3-70b-8192", temperature=0.3, max_tokens=4096)
+gemini = ChatGoogleGenerativeAI(model="gemini/gemini-1.5-flash",temperature=0.5)
+gem = LLM(model="gemini/gemini-1.5-flash",temperature=0.5)
 gemini = ChatGoogleGenerativeAI(model="gemini/gemini-1.5-flash", temperature=0.5)
 gem = LLM(model="gemini/gemini-1.5-flash", temperature=0.5)
 
