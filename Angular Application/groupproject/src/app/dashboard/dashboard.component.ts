@@ -1,13 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 import {NavbarComponent} from "../navbar/navbar.component";
 import {FormsModule} from "@angular/forms";
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgOptimizedImage} from "@angular/common";
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {ReportmodalComponent} from "./modals/reportmodal/reportmodal.component";
 import {CommonModule} from "@angular/common";
 import {ManagemodalComponent} from "./modals/managemodal/managemodal.component";
-import { environment } from '../../environments/environment.development';
+import {environment} from '../../environments/environment.development';
 import {HttpClient} from "@angular/common/http";
+import {getAuth} from "firebase/auth";
+import {ActivatedRoute} from "@angular/router";
+import {UserCheckService} from "../services/user-check.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -17,55 +20,77 @@ import {HttpClient} from "@angular/common/http";
     FormsModule,
     NgForOf,
     MatDialogModule,
-    CommonModule
+    CommonModule,
+    NgOptimizedImage
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
+
 export class DashboardComponent implements OnInit {
-  public data:any;
-  stocks: { name: string, ticker: string }[] = [];
-  constructor(private dialog: MatDialog, private http: HttpClient) {}
+  adminID: string | null = null;
+  public data: any;
+  stocks: {
+    name: string,
+    ticker: string
+  }[] = [];
 
+  constructor(
+    private dialog: MatDialog,
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private userCheck: UserCheckService
+  ) {}
 
-
-
-  ngOnInit(): void {
-    const uri_getstocks = environment.API_BASE_URL + '/getstocks';
+  async ngOnInit() {
+    const uriGetStocks = environment.API_BASE_URL + '/getstocks';
     const requestBody = {};
-    this.http.post<any[]>(uri_getstocks, requestBody).subscribe(
+    const auth = getAuth();
+    const currentUserID = auth.currentUser?.uid;
+
+    this.route.queryParams.subscribe(async params => {
+      if (params['adminID']) {
+        this.adminID = params['adminID'];
+      } else if (currentUserID && await this.userCheck.isUserAnAdmin(currentUserID)) {
+        this.adminID = currentUserID;
+      }
+    });
+
+    this.http.post<any[]>(uriGetStocks, requestBody).subscribe(
       (response) => {
         this.stocks = response;
-      },
-      (error) => {
-        console.error("Error fetching stocks:", error);
       }
     );
   }
-
 
 
   /**
    * Controls the report dialog from the frontend
    * @param name
    */
-  openReportDialog(name: string){
-    this.dialog.open(ReportmodalComponent, {
-      width: '28em',
+  openReportDialog(name: string) {
+    const dialogRef = this.dialog.open(ReportmodalComponent, {
+      width: '30em',
       data: { name: name }
-    })
-  };
+    });
+    dialogRef.afterClosed().subscribe(() => {
+    });
+  }
 
   /**
    * Controls the manage stocks dialog from the frontend
    * @param name
    * @param ticker
    */
-  openManageDialog(name: string, ticker: string){
+  openManageDialog(name: string, ticker: string) {
     this.dialog.open(ManagemodalComponent, {
-      width: '28em',
-      data: { name: name, ticker: ticker }
-    })
+      width: '30em',
+      data: {
+        name: name,
+        ticker: ticker,
+        adminID: this.adminID
+      }
+    });
   }
-/////////////////////////end of file
+
 }

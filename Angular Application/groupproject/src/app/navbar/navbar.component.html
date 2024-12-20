@@ -1,8 +1,13 @@
 <header>
   <ul>
-    <li><a class="active" routerLink="/dashboard">Dashboard</a></li>
-    <li><a routerLink="/userpage" class="active">{{ username }}</a></li>
+    <div *ngIf="!isManager && isAdmin">
+      <li><a class="active" routerLink="/dashboard">Dashboard</a></li>
+    </div>
+    <div *ngIf="isManager && !isAdmin">
+      <li><a class="active" routerLink="/dashboardmanager">Admins</a></li>
+    </div>
+    <li><a routerLink="/userpage" class="active">{{username}}</a></li>
     <li style="float:right"><a routerLink="/helpsupport">Help</a></li>
-    <li style="float:right"><a (click)="logout()">Logout</a></li>
+    <li style="float:right" class="active"><a (click)="logout()">Logout</a></li>
   </ul>
 </header>

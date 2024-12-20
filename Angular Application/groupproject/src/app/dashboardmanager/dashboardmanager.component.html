@@ -1,4 +1,13 @@
 <app-navbar></app-navbar>
-<p>dashboardmanager works!</p>
+<div class="container">
+  <h1>Admin Manager</h1>
+  <div class="form-container" *ngFor="let company of companies; let i = index">
+    <h3>{{company.companyName}} | AdminID: {{company.adminID}}</h3>
+    <div>
+      <button type="button" (click)="manageCompany(company.adminID)">Manage Company</button>
+      <button type="button" (click)="manageAdmin(company.adminID)">Manage Admin</button>
+    </div>
+  </div>
+</div>
 
 

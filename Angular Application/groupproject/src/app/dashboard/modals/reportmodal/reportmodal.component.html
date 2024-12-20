@@ -1,18 +1,48 @@
-<h2 mat-dialog-title>{{ data.name }}</h2>
+<h2 mat-dialog-title>
+  {{ data.name }}
+</h2>
 <mat-dialog-content>
   <div *ngIf="isTheLLMLoading">
     <img ngSrc="assets/monkey-phone.gif" alt="Monkey on a phone" height="146" width="220">
     <p>Our top monkeys are analysing the company, this might take them several seconds...</p>
+    <mat-progress-bar
+      mode="determinate"
+      [value]="progressBar">
+    </mat-progress-bar>
   </div>
-
   <div *ngIf="ifAnErrorHasOccurred">
     <img ngSrc="assets/monkey-rage.gif" alt="monkey at a desk throwing a laptop" height="124" width="220">
     <p>So sorry, an error occurred</p>
   </div>
-
   <div *ngIf="!isTheLLMLoading && responseFromLLM">
-    <p>Response: {{ responseFromLLM.blog }}</p>
+    <p>Date: {{responseFromLLM.date}}</p>
+    <p>{{responseFromLLM.blog}}</p>
+    <p>{{responseFromLLM.extended_blog}}</p>
+    <table style="border-collapse: collapse; width: 100%; margin-top: 10px;">
+      <thead>
+      <tr>
+        <th style="border: 1px solid black; padding: 8px; text-align: left;">Recommendation</th>
+        <th style="border: 1px solid black; padding: 8px; text-align: left;">Value</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px;">Buy</td>
+        <td style="border: 1px solid black; padding: 8px;">{{ responseFromLLM.recommendation.buy }}</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px;">Sell</td>
+        <td style="border: 1px solid black; padding: 8px;">{{ responseFromLLM.recommendation.sell }}</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px;">Hold</td>
+        <td style="border: 1px solid black; padding: 8px;">{{ responseFromLLM.recommendation.hold }}</td>
+      </tr>
+      </tbody>
+    </table>
+    <div>
+      <button type="button" (click)="downloadResponseAsPDF()">Download PDF</button>
+      <button type="button" (click)="closeModal()">Exit</button>
+    </div>
   </div>
-
 </mat-dialog-content>
-

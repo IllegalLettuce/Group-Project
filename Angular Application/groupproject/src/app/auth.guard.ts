@@ -1,43 +1,46 @@
 import { inject } from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivateFn, Router} from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Observable } from 'rxjs';
-import {doc, Firestore, getDoc} from "@angular/fire/firestore";
+import {  Firestore } from '@angular/fire/firestore';
+import {UserCheckService} from "./services/user-check.service";
+
 
 export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const router = inject(Router);
-  const firestore = inject(Firestore);
   const auth = getAuth();
+  const userCheck = inject(UserCheckService);
 
   return new Observable<boolean>((observer) => {
     onAuthStateChanged(auth, async (user) => {
+      //========================== User is logged in ===================================
       if (user) {
-        console.log("User is logged in");
         if (route.routeConfig?.path === '') {
           router.navigate(['dashboard']).then(() => observer.next(false));
         } else if (route.routeConfig?.path === 'dashboardmanager') {
-          const userDocRef = doc(firestore, 'users', user.uid);
-          const userDocSnapshot = await getDoc(userDocRef);
-          if (userDocSnapshot.exists()) {
-            const userType = userDocSnapshot.data()?.['userType'];
-            if (userType === 'admin') {
-              console.log('Admins cannot access the dashboardmanager page.');
-              router.navigate(['dashboard']).then(() => observer.next(false));
-            } else {
-              observer.next(true);
-            }
-          } else {
-            console.error('User document does not exist in Firestore.');
+
+          const isAdmin = await userCheck.isUserAnAdmin(user.uid);
+          const isManager = await  userCheck.isUserAnManager(user.uid)
+
+          if (isAdmin) {
+            console.log("User is admin")
             router.navigate(['dashboard']).then(() => observer.next(false));
           }
-        } else {
+          else if (isManager) {
+            console.log("User is manager")
+            observer.next(true);
+          }
+        }
+        else {
           observer.next(true);
         }
-      } else {
-        console.log("User is logged out");
+      }
+      // =================================== User is logged out ==========================================
+      else {
         if (route.routeConfig?.path === '') {
           observer.next(true);
-        } else {
+        }
+        else {
           router.navigate(['']).then(() => {
             observer.next(false);
           });

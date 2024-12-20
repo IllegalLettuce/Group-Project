@@ -27,24 +27,52 @@ export class ManagemodalComponent {
   manageForm: FormGroup;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { name: string, ticker: string },
-    private httpClient: HttpClient,
+    @Inject(MAT_DIALOG_DATA) public data: { name: string, ticker: string, adminID: any },
+    private http: HttpClient,
     private builder: FormBuilder
   ) {
     this.manageForm = this.builder.group({
       buy: ['',
-        [Validators.required,
-          Validators.pattern(/^100(\.0{1,2})?$|^\d{1,2}(\.\d{1,2})?$/)],
+        [Validators.required],
       ],
       sell: ['',
-        [Validators.required,
-          Validators.pattern(/^100(\.0{1,2})?$|^\d{1,2}(\.\d{1,2})?$/)],
+        [Validators.required],
       ],
       funds_dollar: ['',
-        [Validators.required,
-          Validators.pattern(/^\$?([1-9]\d*(,\d{3})*|0)(\.\d{1,2})?$/)]
+        [Validators.required]
       ],
     });
+  }
+
+  /**
+   * Format percentage input
+   */
+  formatPercentageInput(formField: string) {
+    let value = this.manageForm.get(formField)?.value;
+    value = value.replace(/\D/g, '');
+    let numericValue = Number(value);
+    if (numericValue < 1) {
+      numericValue = 1;
+    } else if (numericValue > 100) {
+      numericValue = 100;
+    }
+    value = numericValue.toString();
+    value = value + '%';
+    this.manageForm.get(formField)?.setValue(value, { emitEvent: false });
+  }
+
+
+  /**
+   * Form USD funds
+   */  // Format the input value to US dollar format and prepend the '$'
+  formatCurrencyInput() {
+    let value = this.manageForm.get('funds_dollar')?.value;
+    value = value.replace(/[^\d.-]/g, '');
+    if (value) {
+      value = Number(value).toLocaleString('en-US');
+      value = '$' + value;
+      this.manageForm.get('funds_dollar')?.setValue(value, { emitEvent: false });
+    }
   }
 
   /**
@@ -54,14 +82,16 @@ export class ManagemodalComponent {
     const uri_manage = this.uri + '/manage';
     const {buy, sell, funds_dollar} = this.manageForm.value;
     let message:JSON = <JSON><unknown>{
+      "userID" : this.data.adminID,
       "company": this.data.name,
       "ticker": this.data.ticker,
       "buy_percent": buy ,
       "sell_percent": sell,
       "funds_dollar": funds_dollar,
     };
+    let messageString = JSON.stringify(message)
     try{
-      this.httpClient.post(uri_manage, message)
+      this.http.post(uri_manage, messageString)
         .subscribe({
           next: (data: any) => {
           }, error: () => this.ifError = true
@@ -70,9 +100,8 @@ export class ManagemodalComponent {
     }catch(error){
       this.ifError = true;
       if (error instanceof HttpErrorResponse){
-        console.log("Unable to connect to the server. Please check your connection")
+        console.log("Unable to connect to the server. Please check your connection");
       }
     }
   };
-//////////////////////////////////////////////////////////
 }

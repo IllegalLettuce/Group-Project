@@ -1,2 +1,27 @@
 <app-navbar></app-navbar>
-<p>userpage works!</p>
+<div class="container">
+  <div *ngIf="isAdmin && !isManager">
+    <div *ngIf="isManager && !isAdmin">
+      <h2 class="text-center">Admin ID: {{adminID}} </h2>
+    </div>
+    <h2 class="text-center">Your current funds: ${{userFunds?.capital}}</h2>
+    <div class="form-container" *ngFor="let stock of managedStocks; let i = index">
+      <p>Company: {{stock.company}}</p>
+      <p>Ticker: {{stock.ticker}}</p>
+      <p>Shares Owned: {{stock.shares_owned}}</p>
+      <p>Funds: {{stock.funds_dollar}}</p>
+      <p>Buy Threshold: {{stock.buy_percent}}</p>
+      <p>Sell Threshold: {{stock.sell_percent}}</p>
+    </div>
+  </div>
+  <div *ngIf="isManager && !isAdmin">
+    <h2 class="text-center">This feature is in development for managers</h2>
+    <div class="form-container">
+      <p>Something will go here...</p>
+    </div>
+  </div>
+</div>
+
+
+
+

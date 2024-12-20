@@ -12,6 +12,12 @@
   padding: 2rem;
 }
 
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+
 .register-left {
   flex-direction: column;
   background-color: #f5f5f5;
@@ -57,6 +63,10 @@
   cursor: pointer;
 }
 
+.register-left form input.ng-invalid.ng-touched {
+  border-color: red;
+}
+
 .register-left .btn-google {
   background-color: #000000;
   color: white;
@@ -71,3 +81,11 @@
   background-color: #4a90e2;
   color: white;
 }
+.register-left form input[type="text"],
+.register-left form input[type="email"],
+.register-left form input[type="password"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
