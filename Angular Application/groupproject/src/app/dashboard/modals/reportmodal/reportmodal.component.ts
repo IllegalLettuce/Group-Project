@@ -3,19 +3,21 @@ import {
   MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
-  MatDialogContent, MatDialogRef,
+  MatDialogContent,
+  MatDialogRef,
   MatDialogTitle
 } from "@angular/material/dialog";
 import {MatButton, MatIconButton} from "@angular/material/button";
-import {firstValueFrom, timeout} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../../environments/environment.development";
 import {CommonModule, NgOptimizedImage} from "@angular/common";
 import {getAuth} from "firebase/auth";
 import {MatIcon} from "@angular/material/icon";
-import { jsPDF } from 'jspdf';
+import {jsPDF} from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import {MatProgressBar} from "@angular/material/progress-bar";
+import {firstValueFrom, timeout} from "rxjs";
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-reportmodal',
@@ -36,17 +38,20 @@ import {MatProgressBar} from "@angular/material/progress-bar";
   styleUrl: './reportmodal.component.css'
 })
 export class ReportmodalComponent implements OnInit {
-  responseFromLLM: any;
   uri = environment.API_BASE_URL;
   isTheLLMLoading: boolean = false;
   ifAnErrorHasOccurred: boolean = false;
   progressBar: number = 0;
   progressInterval: any;
+  responseFromLLM: any;
+
+
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { name: string },
     private httpClient: HttpClient,
-    public dialogRef: MatDialogRef<ReportmodalComponent>
+    public dialogRef: MatDialogRef<ReportmodalComponent>,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -82,9 +87,9 @@ export class ReportmodalComponent implements OnInit {
    */
   async fetchData(name: string) {
     try {
-      const uri_report = `${this.uri}/report`;
+      const uri_report = this.uri + "/report";
       this.responseFromLLM = await firstValueFrom(
-        this.httpClient.post(uri_report, { params: { name } })
+        this.httpClient.post<any>(uri_report, { params: { name } })
           .pipe(timeout(120000))
       );
     } catch (error) {

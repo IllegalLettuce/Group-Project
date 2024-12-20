@@ -62,7 +62,7 @@ export class RegistrationComponent implements OnInit {
         }
         if (parsedData.adminEmails && Array.isArray(parsedData.adminEmails)) {
           parsedData.adminEmails.forEach((email: string) => {
-            adminEmailsArray.push(this.builder.group({ email: [email, [Validators.required, Validators.email]] }));
+            adminEmailsArray.push(this.builder.group({ email: [email, [Validators.email]] }));
           });
         }
 

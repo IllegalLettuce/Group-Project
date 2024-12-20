@@ -67,11 +67,12 @@ export class ManagemodalComponent {
    */  // Format the input value to US dollar format and prepend the '$'
   formatCurrencyInput() {
     let value = this.manageForm.get('funds_dollar')?.value;
+    let value_percent = "";
     value = value.replace(/[^\d.-]/g, '');
     if (value) {
       value = Number(value).toLocaleString('en-US');
-      value = '$' + value;
-      this.manageForm.get('funds_dollar')?.setValue(value, { emitEvent: false });
+      value_percent = '$' + value;
+      this.manageForm.get('funds_dollar')?.setValue(value_percent, { emitEvent: false });
     }
   }
 
@@ -80,12 +81,12 @@ export class ManagemodalComponent {
    */
   sendToLLM(){
     const uri_manage = this.uri + '/manage';
-    const {buy, sell, funds_dollar} = this.manageForm.value;
+    let {buy, sell, funds_dollar} = this.manageForm.value;
     let message:JSON = <JSON><unknown>{
       "userID" : this.data.adminID,
       "company": this.data.name,
       "ticker": this.data.ticker,
-      "buy_percent": buy ,
+      "buy_percent": buy,
       "sell_percent": sell,
       "funds_dollar": funds_dollar,
     };

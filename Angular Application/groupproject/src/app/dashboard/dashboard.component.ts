@@ -34,6 +34,7 @@ export class DashboardComponent implements OnInit {
     name: string,
     ticker: string
   }[] = [];
+  userFunds: any
 
   constructor(
     private dialog: MatDialog,
@@ -47,6 +48,7 @@ export class DashboardComponent implements OnInit {
     const requestBody = {};
     const auth = getAuth();
     const currentUserID = auth.currentUser?.uid;
+
 
     this.route.queryParams.subscribe(async params => {
       if (params['adminID']) {
