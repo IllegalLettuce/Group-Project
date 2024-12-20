@@ -2,7 +2,8 @@
 import os
 from crewai import Agent, LLM
 from langchain_groq import ChatGroq
-from langchain_google_generativeai import ChatGoogleGenerativeAI
+from pydantic.v1 import BaseModel
+from langchain_google_genai import ChatGoogleGenerativeAI
 import config
 
 # Configure environment variables

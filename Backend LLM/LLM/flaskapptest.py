@@ -3,7 +3,7 @@ import os
 import json
 import time
 from threading import Thread
-
+from pydantic.v1 import BaseModel
 from google.cloud.firestore_v1 import FieldFilter
 from sympy.testing.runtests import method
 
@@ -16,7 +16,7 @@ from flask_cors import CORS
 import logging
 import re
 from crewai import Agent, Task, Crew, LLM
-from langchain_groq import ChatGroq
+# from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 import yfinance as yf
 from crewai_tools import WebsiteSearchTool
