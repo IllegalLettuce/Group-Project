@@ -1,9 +1,13 @@
 <app-navbar></app-navbar>
 <div class="container-fluid user-page">
-  <div>
-    <h2 class="text-center">This feature is in development</h2>
+  <div *ngIf="isAdmin && !isManager">
+    <h2 class="text-center">This feature is in development for admins</h2>
+  </div>
+  <div *ngIf="isManager && !isAdmin">
+    <h2 class="text-center">This feature is in development for managers</h2>
   </div>
 </div>
+
 
 
 
