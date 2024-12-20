@@ -704,11 +704,7 @@ def getstocks():
 @app.route('/useradmin',methods=['POST'])
 def useradmin():
     if request.method == "POST":
-<<<<<<< Updated upstream
-        print(request.data)
-=======
         print("admin")
->>>>>>> Stashed changes
         datainput = json.loads(request.data.decode('utf-8'))
         userid = datainput.get('uid')
         print(userid)
@@ -721,16 +717,10 @@ def useradmin():
                 return jsonify({
                     'response':"yes"
                 }),200
-<<<<<<< Updated upstream
-    return jsonify({
-        'response':"no"
-    }),200
-=======
         return jsonify({
             'response':"no"
         }),200
 
->>>>>>> Stashed changes
 
 
 
@@ -738,19 +728,11 @@ def useradmin():
 @app.route('/usermanager',methods=['POST'])
 def usermanager():
     if request.method == "POST":
-<<<<<<< Updated upstream
-        print(request.data)
-        datainput = json.loads(request.data.decode('utf-8'))
-        userid = datainput.get('uid')
-        docs = (
-            db.collection("manager").stream()
-=======
         print("manager")
         datainput = json.loads(request.data.decode('utf-8'))
         userid = datainput.get('uid')
         docs = (
             db.collection("managers").stream()
->>>>>>> Stashed changes
         )
         docs = list(docs)
         for doc in docs:
@@ -758,16 +740,10 @@ def usermanager():
                 return jsonify({
                     'response':"yes"
                 }),200
-<<<<<<< Updated upstream
-    return jsonify({
-        'response':"no"
-    }),200
-=======
         return jsonify({
             'response':"no"
         }),200
 
->>>>>>> Stashed changes
 
 
 @app.route('/userfunds',methods=['POST'])
@@ -792,8 +768,36 @@ def getUserFunds():
         }),200
 
 
+@app.route('/managedstocks',methods=['POST'])
+def managedstocks():
+    if request.method == "POST":
+        datainput = json.loads(request.data.decode('utf-8'))
+        userid = str(datainput.get('userID'))
+        docs = (
+            db.collection("autopurchase").stream()
+        )
+        docs = list(docs)
+        managedStocks = []
+        if docs:
+            for doc in docs:
+                if doc.get('userid') == userid:
+                    managedStocks.append({
+                        "buy_percent":doc.get('buy_percent'),
+                        "sell_percent":doc.get('sell_percent'),
+                        "company":doc.get('company'),
+                        "funds_dollar":doc.get('funds_dollar'),
+                        "shares_owned":doc.get('shares_owned'),
+                        "ticker":doc.get('ticker')
+                    })
+        print(managedStocks)
+        return jsonify(managedStocks), 200
+    return jsonify({
+        "status": "Error",
+        "message": "Invalid request or unhandled condition."
+    }), 400
 
-#this will be the autopurchase when its done
+
+
 @app.route('/manage', methods=['POST', 'OPTIONS'])
 def autopurchaseregister():
     if request.method == "POST":
