@@ -4,8 +4,6 @@ import { getAuth, signOut } from "firebase/auth";
 import {UserCheckService} from "../services/user-check.service";
 import {NgIf} from "@angular/common";
 
-
-
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -23,7 +21,6 @@ export class NavbarComponent implements OnInit{
   isManager = false;
   isAdmin = false;
 
-
   constructor(
     private userCheck: UserCheckService,
   ) {}
@@ -35,6 +32,9 @@ export class NavbarComponent implements OnInit{
     this.getUserType()
   }
 
+  /**
+   * Admin or manager
+   */
   async getUserType(){
     const userID = this.user?.uid;
     if (userID != null) {
@@ -43,12 +43,13 @@ export class NavbarComponent implements OnInit{
     }
   }
 
+  /**
+   * Sends back to login page
+   */
   logout(){
     const auth = getAuth();
     signOut(auth).then(() =>{
       window.location.replace('')
     }).catch(console.log)
   }
-
-
 }

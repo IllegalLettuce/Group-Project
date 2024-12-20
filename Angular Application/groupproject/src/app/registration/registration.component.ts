@@ -30,7 +30,7 @@ export class RegistrationComponent implements OnInit {
       name: ['', Validators.required],
       surname: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]], //Validators.pattern(this.StrongPasswordRegx)
+      password: ['', [Validators.required, Validators.pattern(this.StrongPasswordRegx)]],
       confirmPassword: ['', Validators.required],
       userType: ['', Validators.required],
       companyName: [''],
@@ -119,7 +119,6 @@ export class RegistrationComponent implements OnInit {
     }
   }
 
-
   /**
    * Different inputs for admin or manager in the form
    */
@@ -179,7 +178,6 @@ export class RegistrationComponent implements OnInit {
       queryParams: { amount: paymentAmount.toFixed(2) }
     });
   }
-
 
   /**
    * Register user when back from paypal

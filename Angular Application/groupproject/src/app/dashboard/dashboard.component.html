@@ -2,7 +2,7 @@
 <div class="container">
   <h1>Dashboard for ID: {{adminID}}</h1>
   <div class="form-container" *ngFor="let stock of stocks; let i = index">
-    <h3>Select Stock: {{ stock.name }}</h3>
+    <h3>Select Stock: {{stock.name}}</h3>
     <div>
       <button type="button" (click)="openReportDialog(stock.name)">Generate Report</button>
       <button type="button" (click)="openManageDialog(stock.name, stock.ticker)">Manage Stock</button>

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment.development";
 import {lastValueFrom} from "rxjs";

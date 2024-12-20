@@ -23,7 +23,6 @@ import {getAuth} from "firebase/auth";
 export class HelpsupportComponent {
   helpForm: FormGroup;
 
-
   constructor(private builder: FormBuilder, public firestore: Firestore) {
     this.helpForm = this.builder.group({
       title: ['', Validators.required],
@@ -31,6 +30,11 @@ export class HelpsupportComponent {
     });
   }
 
+  /**
+   * Connects to firebase and places help message
+   * @param title
+   * @param message
+   */
   async createHelpMsg(title: string, message: string) {
     const auth = getAuth();
     const docRef = await addDoc(collection(this.firestore, 'help_message'), {
@@ -40,6 +44,9 @@ export class HelpsupportComponent {
     });
   }
 
+  /**
+   * Button handler from the form
+   */
   submitHelp() {
     const {title, message} = this.helpForm.value;
     this.createHelpMsg(title, message)

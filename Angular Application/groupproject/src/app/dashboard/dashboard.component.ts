@@ -6,11 +6,11 @@ import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {ReportmodalComponent} from "./modals/reportmodal/reportmodal.component";
 import {CommonModule} from "@angular/common";
 import {ManagemodalComponent} from "./modals/managemodal/managemodal.component";
-import { environment } from '../../environments/environment.development';
+import {environment} from '../../environments/environment.development';
 import {HttpClient} from "@angular/common/http";
 import {getAuth} from "firebase/auth";
 import {ActivatedRoute} from "@angular/router";
-import { UserCheckService } from "../services/user-check.service";
+import {UserCheckService} from "../services/user-check.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -46,7 +46,7 @@ export class DashboardComponent implements OnInit {
     const uriGetStocks = environment.API_BASE_URL + '/getstocks';
     const requestBody = {};
     const auth = getAuth();
-    const currentUserID = auth.currentUser?.uid || null;
+    const currentUserID = auth.currentUser?.uid;
 
     this.route.queryParams.subscribe(async params => {
       if (params['adminID']) {
@@ -54,17 +54,11 @@ export class DashboardComponent implements OnInit {
       } else if (currentUserID && await this.userCheck.isUserAnAdmin(currentUserID)) {
         this.adminID = currentUserID;
       }
-      if (!this.adminID) {
-        console.error("Admin ID could not be determined.");
-      } else {
-        console.log("Using adminID for dashboard:", this.adminID);
-      }
     });
 
     this.http.post<any[]>(uriGetStocks, requestBody).subscribe(
       (response) => {
         this.stocks = response;
-        console.log(response);
       }
     );
   }

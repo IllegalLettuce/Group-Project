@@ -27,26 +27,6 @@ h3 {
   text-align: center;
 }
 
-label {
-  display: block;
-  margin-top: 10px;
-}
-
-.form-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-input {
-  width: 48%;
-  padding: 8px;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
 button {
   width: 100%;
   padding: 10px;

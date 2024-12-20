@@ -31,7 +31,6 @@
       ticker: string;
     }[] = [];
     adminID: string | null = null;
-    userName: any;
 
     constructor(
       private userCheck: UserCheckService,

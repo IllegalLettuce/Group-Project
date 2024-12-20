@@ -32,7 +32,6 @@ export class DashboardmanagerComponent implements OnInit{
     const uriGetCompanies = environment.API_BASE_URL + "/getcompanies";
     const auth = getAuth();
     let managerID = auth.currentUser?.uid;
-
     const json_manager = {
       "managerID": managerID
     }
